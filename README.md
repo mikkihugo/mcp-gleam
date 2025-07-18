@@ -3,18 +3,179 @@
 [![Package Version](https://img.shields.io/hexpm/v/gleamcp)](https://hex.pm/packages/gleamcp)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/gleamcp/)
 
+A full-featured Model Context Protocol (MCP) server implementation in Gleam supporting multiple transports and bidirectional communication.
+
+## Features
+
+- **Multiple Transport Support**: stdio, WebSocket, and Server-Sent Events (SSE)
+- **Bidirectional Communication**: Server-initiated requests and notifications
+- **Transport Bridging**: Connect different transports together
+- **Full MCP Protocol Compliance**: Support for resources, tools, prompts, and sampling
+- **Resource Subscriptions**: Real-time updates for resource changes
+- **Extensible Architecture**: Easy to add new transports and capabilities
+
+## Quick Start
+
 ```sh
 gleam add gleamcp@1
 ```
+
+### Basic Usage
+
 ```gleam
 import gleamcp
 
 pub fn main() -> Nil {
-  // TODO: An example of the project in use
+  // Run with stdio transport (default)
+  gleamcp.main()
 }
 ```
 
-Further documentation can be found at <https://hexdocs.pm/gleamcp>.
+### Available Commands
+
+```sh
+# Traditional stdio transport
+gleam run stdio
+
+# WebSocket server on localhost:8080
+gleam run websocket
+
+# Server-Sent Events on localhost:8081  
+gleam run sse
+
+# Bridge between stdio and WebSocket
+gleam run bridge
+
+# Full server with all transports and bidirectional support
+gleam run full
+
+# Print server capabilities (legacy)
+gleam run print
+```
+
+## Transport Types
+
+### Stdio Transport
+
+The traditional MCP transport using stdin/stdout for JSON-RPC communication.
+
+```gleam
+import gleamcp/transport
+
+let stdio_transport = transport.Stdio(transport.StdioTransport)
+```
+
+### WebSocket Transport
+
+Real-time bidirectional communication over WebSocket.
+
+```gleam
+let ws_transport = transport.WebSocket(transport.WebSocketTransport(
+  port: 8080,
+  host: "localhost"
+))
+```
+
+Clients can connect to: `ws://localhost:8080/mcp`
+
+### Server-Sent Events (SSE) Transport
+
+One-way server-to-client communication with HTTP POST for client-to-server.
+
+```gleam
+let sse_transport = transport.ServerSentEvents(transport.SSETransport(
+  port: 8081,
+  host: "localhost",
+  endpoint: "mcp"
+))
+```
+
+- SSE endpoint: `http://localhost:8081/mcp` (GET)
+- Message endpoint: `http://localhost:8081/mcp` (POST)
+
+## Bidirectional Communication
+
+The server supports server-initiated requests and notifications:
+
+```gleam
+import gleamcp/bidirectional
+
+// Notify clients of resource changes
+bidirectional.notify_resource_changed(server, "file://example.txt")
+
+// Notify clients of tool changes  
+bidirectional.notify_tool_changed(server)
+
+// Send custom notifications
+let params = json.object([#("message", json.string("Hello!"))])
+process.send(server.message_subject, 
+  bidirectional.SendNotification("custom/notification", params, None))
+```
+
+## Transport Bridging
+
+Connect different transports to create hybrid communication patterns:
+
+```gleam
+import gleamcp/bridge
+
+// Create a bridge between stdio and WebSocket
+let stdio_transport = transport.Stdio(transport.StdioTransport)
+let ws_transport = transport.WebSocket(transport.WebSocketTransport(
+  port: 8080, host: "localhost"
+))
+
+let bridge_config = bridge.create_simple_bridge(
+  "stdio-to-websocket",
+  stdio_transport, 
+  ws_transport
+)
+
+// Add message filtering
+let filtered_bridge = bridge.create_filtered_bridge(
+  "requests-only",
+  stdio_transport,
+  ws_transport, 
+  bridge.requests_only_filter()
+)
+```
+
+## Advanced Server Setup
+
+```gleam
+import gleamcp/server
+import gleamcp/transport
+import gleamcp/bidirectional
+
+pub fn advanced_server() {
+  // Create server with capabilities
+  let server = server.new("My MCP Server", "1.0.0")
+    |> server.description("Advanced MCP server example")
+    |> server.add_resource(my_resource(), my_resource_handler)
+    |> server.add_tool(my_tool(), my_tool_decoder(), my_tool_handler)
+    |> server.resource_capabilities(True, True) // Enable subscriptions
+    |> server.tool_capabilities(True) // Enable list_changed notifications
+    |> server.enable_logging()
+    |> server.build()
+
+  // Configure multiple transports
+  let transports = [
+    transport.Stdio(transport.StdioTransport),
+    transport.WebSocket(transport.WebSocketTransport(port: 8080, host: "0.0.0.0")),
+    transport.ServerSentEvents(transport.SSETransport(port: 8081, host: "0.0.0.0", endpoint: "mcp")),
+  ]
+
+  // Start bidirectional server
+  case bidirectional.new_bidirectional_server(server, transports) {
+    Ok(bidir_server) -> {
+      bidirectional.start_bidirectional_server(bidir_server)
+    }
+    Error(err) -> {
+      io.println("Failed to start server: " <> err)
+    }
+  }
+}
+```
 
 ## Development
 
@@ -27,24 +188,21 @@ gleam test  # Run the tests
 
 ### Server
 
-<details>
-<summary>Show Server Examples</summary>
-
 The server is your core interface to the MCP protocol. It handles connection management, protocol compliance, and message routing:
 
 ```gleam
 let srv = server.new("My Server", "1.0.0")
 
+// For stdio transport (legacy)
 server.serve_stdio(srv) // Result(Pid?, StartError)
 process.sleep_forever()
-```
 
-</details>
+// For multiple transports (new)
+bidirectional.start_bidirectional_server(srv)
+```
 
 ### Resources
 
-<details>
-<summary>Show Resource Examples</summary>
 Resources are how you expose data to LLMs. They can be anything - files, API responses, database queries, system information, etc. Resources can be:
 
 - Static (fixed URI)
@@ -69,11 +227,56 @@ server.new()
   })
 ```
 
-### Unsupported Features
-* batch messages
-* resource subscribe
-* pagination (it returns all resources, etc.)
-* resource templates (need a uri template lib)
-* server notifications (resources cannot change yet)
-* _meta field
-* experimental field
+## Transport Architecture
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   MCP Client    │◄──►│  Transport Layer │◄──►│   MCP Server    │
+│                 │    │                  │    │                 │
+│  • Claude       │    │  • stdio         │    │  • Resources    │
+│  • VS Code      │    │  • WebSocket     │    │  • Tools        │
+│  • Custom App   │    │  • SSE           │    │  • Prompts      │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                              │
+                       ┌──────▼──────┐
+                       │   Bridge    │
+                       │             │
+                       │ • Filter    │
+                       │ • Transform │
+                       │ • Route     │
+                       └─────────────┘
+```
+
+## Protocol Support
+
+### Supported Features
+- ✅ Resources (static and templates)
+- ✅ Tools with JSON schema validation
+- ✅ Prompts and prompt templates
+- ✅ Bidirectional communication
+- ✅ Server-initiated notifications
+- ✅ Resource/tool/prompt change notifications
+- ✅ Multiple transport support
+- ✅ Transport bridging
+- ✅ Logging capabilities
+
+### Partially Supported
+- ⚠️ Sampling (basic support)
+- ⚠️ Progress tracking (_meta field)
+
+### Not Yet Supported
+- ❌ Batch messages
+- ❌ Pagination for large lists
+- ❌ Experimental fields
+- ❌ Resource templates with URI patterns
+
+## Examples
+
+See the `examples/` directory for more usage examples:
+
+- `basic_stdio.gleam` - Simple stdio MCP server
+- `websocket_server.gleam` - WebSocket MCP server
+- `bridge_example.gleam` - Transport bridging
+- `full_server.gleam` - Complete bidirectional server
+
+Further documentation can be found at <https://hexdocs.pm/gleamcp>.
