@@ -3,7 +3,7 @@ import gleam/io
 import gleam/json.{type Json}
 import gleam/option.{type Option}
 import gleam/result
-import mcp_gleam/server/stdio
+import mcp_toolkit_gleam/transport/stdio
 
 /// Represents different transport mechanisms for MCP
 pub type Transport {
@@ -96,7 +96,7 @@ fn stdio_send(message: TransportMessage) -> Result(Nil, String) {
 }
 
 fn stdio_receive() -> Result(TransportEvent, String) {
-  case mcp_gleam/server/stdio.read_message() {
+  case stdio.read_message() {
     Ok(content) -> {
       let transport_msg = TransportMessage(content: content, id: None)
       Ok(MessageReceived(transport_msg))

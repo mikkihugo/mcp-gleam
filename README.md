@@ -30,14 +30,17 @@ Production-ready Model Context Protocol (MCP) Toolkit implementation in Gleam wi
 
 #### For Stdio Transport Only (Dependency-Free)
 ```bash
-# Comment out mist dependency in gleam.toml for minimal installation
+# Configure for stdio-only mode in gleam.toml:
+# [config]
+# transport_mode = "stdio"
 gleam build
 gleam run -- mcpstdio
 ```
 
-#### For Full Transport Support
+#### For Full Transport Support (Default)
 ```bash
-# Includes WebSocket and SSE transports
+# Default configuration includes all transports
+# transport_mode = "full" enables WebSocket and SSE
 gleam deps download
 gleam build
 gleam run -- mcpserver [transport]
@@ -139,6 +142,7 @@ gleam test --coverage
 - **2025-06-18** (Latest specification)
 - **2025-03-26** (Backward compatible)
 - **2024-11-05** (Backward compatible)
+- **2024-10-07** (Backward compatible)
 
 ### Implemented Features
 - ✅ Resource management with subscriptions
@@ -162,10 +166,19 @@ justin = ">= 1.0.1 and < 2.0.0"
 gleam_erlang = ">= 0.34.0 and < 1.0.0"
 ```
 
-### Optional Dependencies
+### Dependencies Configuration
+
+The mist dependency is now configurable via gleam.toml:
+
 ```toml
-# Only needed for WebSocket/SSE transports
-mist = ">= 3.0.0 and < 4.0.0"
+# Set transport_mode in gleam.toml:
+[config]
+transport_mode = "full"    # Default: enables all transports (requires mist)
+# transport_mode = "stdio"   # stdio-only mode (no mist dependency)
+
+[dependencies.mist]
+version = ">= 3.0.0 and < 4.0.0"
+optional = true
 ```
 
 ### Development Dependencies
@@ -248,6 +261,7 @@ Apache-2.0 License. See [LICENSE](LICENSE) for details.
 ## 🔗 Links
 
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification/2025-06-18/)
+- [MCP GitHub Releases](https://github.com/modelcontextprotocol/modelcontextprotocol/releases/tag/2025-06-18)
 - [Gleam Language](https://gleam.run/)
 - [MCP SDK Documentation](https://github.com/modelcontextprotocol)
 

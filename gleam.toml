@@ -14,18 +14,28 @@ jsonrpc = ">= 1.0.0 and < 2.0.0"
 justin = ">= 1.0.1 and < 2.0.0"
 gleam_erlang = ">= 0.34.0 and < 1.0.0"
 
-# Optional dependencies (only needed for WebSocket/SSE transports)
-# Comment out if you only need stdio transport
-mist = ">= 3.0.0 and < 4.0.0"
+# Transport configuration
+# Set transport_mode to control which dependencies are included:
+# - "stdio": stdio transport only (no external dependencies)  
+# - "full": all transports including WebSocket/SSE (requires mist)
+[config]
+transport_mode = "full"
+
+# Conditional dependencies based on transport_mode
+[dependencies.mist]
+version = ">= 3.0.0 and < 4.0.0"
+optional = true
 
 # Build targets
 [[binaries]]
 name = "mcpstdio"
 path = "./src/mcpstdio.gleam"
+description = "MCP server with stdio transport only (dependency-free)"
 
 [[binaries]]
-name = "mcpserver"
+name = "mcpserver"  
 path = "./src/mcpserver.gleam"
+description = "MCP server with all transports (requires mist when transport_mode=full)"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"

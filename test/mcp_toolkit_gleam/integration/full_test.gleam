@@ -261,13 +261,14 @@ pub fn complete_integration_snapshot_test() {
 
 // Test backward compatibility
 pub fn backward_compatibility_test() {
-  // Test that legacy protocol versions are still supported
-  let legacy_versions = ["2024-11-05", "2024-10-07"]
+  // Test that legacy protocol versions are still supported  
+  let current_version = "2025-06-18"
+  let legacy_versions = ["2025-03-26", "2024-11-05", "2024-10-07"]
   
   legacy_versions
-  |> should.have_length(2)
+  |> should.have_length(3)
   
-  // Current version should be newer
+  // Current version should be 2025-06-18
   mcp.protocol_version |> should.equal("2025-06-18")
 }
 
