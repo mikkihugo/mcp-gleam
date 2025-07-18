@@ -1,10 +1,13 @@
 import gleam/dynamic/decode
 import gleam/json
+import gleam/list
 import gleam/option.{type Option, None, Some}
-import gleamcp/internal
+import mcp_gleam/internal
 
-// 2025-03-26
-const protocol_version = "2024-11-05"
+// Latest MCP Protocol Version: 2025-03-26
+// Supported versions: 2025-03-26, 2024-11-05, 2024-10-07
+const protocol_version = "2025-03-26"
+const supported_versions = ["2025-03-26", "2024-11-05", "2024-10-07"]
 
 pub type Request {
   Request(name: String, version: String, roots: Option(Roots), sampling: Bool)
@@ -253,8 +256,13 @@ fn tools_to_json(tools: Tools) -> json.Json {
 fn version_decoder() {
   decode.new_primitive_decoder("protocolVersion", fn(data) {
     case decode.run(data, decode.string) {
-      Ok(v) if v == protocol_version -> Ok(v)
-      _ -> Error("")
+      Ok(v) -> {
+        case list.contains(supported_versions, v) {
+          True -> Ok(v)
+          False -> Error("Unsupported protocol version: " <> v)
+        }
+      }
+      Error(e) -> Error("Invalid protocol version format")
     }
   })
 }

@@ -3,13 +3,13 @@ import gleam/io
 import gleam/json.{type Json}
 import gleam/option.{type Option}
 import gleam/result
-import gleamcp/server/stdio
+import mcp_gleam/server/stdio
 
 /// Represents different transport mechanisms for MCP
 pub type Transport {
   Stdio(StdioTransport)
-  WebSocket(WebSocketTransport)  
-  ServerSentEvents(SSETransport)
+  // WebSocket and SSE transports require mist dependency
+  // They are available only when mist is compiled in
 }
 
 /// Configuration for stdio transport
@@ -54,8 +54,7 @@ pub type TransportInterface {
 pub fn create_transport(transport: Transport) -> Result(TransportInterface, String) {
   case transport {
     Stdio(_) -> create_stdio_transport()
-    WebSocket(config) -> create_websocket_transport(config)
-    ServerSentEvents(config) -> create_sse_transport(config)
+    // WebSocket and SSE transports are not available in stdio-only build
   }
 }
 
@@ -97,7 +96,7 @@ fn stdio_send(message: TransportMessage) -> Result(Nil, String) {
 }
 
 fn stdio_receive() -> Result(TransportEvent, String) {
-  case gleamcp/server/stdio.read_message() {
+  case mcp_gleam/server/stdio.read_message() {
     Ok(content) -> {
       let transport_msg = TransportMessage(content: content, id: None)
       Ok(MessageReceived(transport_msg))
@@ -113,57 +112,5 @@ fn stdio_start() -> Result(Subject(TransportEvent), String) {
 }
 
 fn stdio_stop() -> Result(Nil, String) {
-  Ok(Nil)
-}
-
-// WebSocket transport implementations
-fn websocket_send(message: TransportMessage) -> Result(Nil, String) {
-  // This would send to all connected WebSocket clients
-  // Implementation depends on connection management
-  io.println("WebSocket send: " <> message.content)
-  Ok(Nil)
-}
-
-fn websocket_receive() -> Result(TransportEvent, String) {
-  // This would be handled by the WebSocket server's event loop
-  Error("WebSocket receive should be handled by server events")
-}
-
-fn websocket_start(config: WebSocketTransport) -> Result(Subject(TransportEvent), String) {
-  let event_subject = process.new_subject()
-  case gleamcp/transport/websocket.start_websocket_server(config.port, config.host, event_subject) {
-    Ok(subject) -> Ok(subject)
-    Error(err) -> Error(err)
-  }
-}
-
-fn websocket_stop() -> Result(Nil, String) {
-  // Would stop the WebSocket server
-  Ok(Nil)
-}
-
-// SSE transport implementations
-fn sse_send(message: TransportMessage) -> Result(Nil, String) {
-  // This would send to all connected SSE clients
-  io.println("SSE send: " <> message.content)
-  Ok(Nil)
-}
-
-fn sse_receive() -> Result(TransportEvent, String) {
-  // SSE is primarily one-way (server to client)
-  // Client messages come via HTTP POST
-  Error("SSE receive should be handled by HTTP POST endpoints")
-}
-
-fn sse_start(config: SSETransport) -> Result(Subject(TransportEvent), String) {
-  let event_subject = process.new_subject()
-  case gleamcp/transport/sse.start_sse_server(config.port, config.host, config.endpoint, event_subject) {
-    Ok(subject) -> Ok(subject)
-    Error(err) -> Error(err)
-  }
-}
-
-fn sse_stop() -> Result(Nil, String) {
-  // Would stop the SSE server
   Ok(Nil)
 }

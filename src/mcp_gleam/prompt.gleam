@@ -1,7 +1,7 @@
 import gleam/dynamic/decode.{type Decoder}
 import gleam/json.{type Json}
 import gleam/option.{type Option, None, Some}
-import gleamcp/internal
+import mcp_gleam/internal
 
 pub type Prompt {
   Prompt(name: String, description: Option(String), arguments: List(Argument))

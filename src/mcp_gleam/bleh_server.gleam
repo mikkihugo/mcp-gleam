@@ -3,12 +3,12 @@ import gleam/dynamic/decode.{type Decoder, type Dynamic}
 import gleam/json
 import gleam/list
 import gleam/result
-import gleamcp/method
+import mcp_gleam/method
 import jsonrpc
 
 import gleam/option.{type Option, None, Some}
 
-import gleamcp/mcp
+import mcp_gleam/mcp
 
 pub type Builder {
   Builder(

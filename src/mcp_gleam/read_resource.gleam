@@ -1,6 +1,6 @@
 import gleam/dynamic/decode
 import gleam/json
-import gleamcp/resource.{type Content}
+import mcp_gleam/resource.{type Content}
 
 pub type Request {
   Request(uri: String)

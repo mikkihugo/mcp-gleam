@@ -1,6 +1,6 @@
 import gleam/dynamic/decode.{type Decoder}
 import gleam/json.{type Json}
-import gleamcp/resource
+import mcp_gleam/resource
 
 pub type Content {
   Text(text: String)

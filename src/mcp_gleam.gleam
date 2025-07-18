@@ -6,36 +6,29 @@ import gleam/json
 import gleam/option.{None, Some}
 import gleam/result
 import gleam/string
-import gleamcp/mcp
+import mcp_gleam/mcp
 
-import gleamcp/bleh_server as server
-import gleamcp/server/stdio
+import mcp_gleam/bleh_server as server
+import mcp_gleam/server/stdio
 
 pub fn main() {
   case argv.load().arguments {
     ["print"] -> print(create_legacy_server())
     ["stdio"] -> run_stdio_server()
-    ["websocket"] -> run_websocket_server() 
-    ["sse"] -> run_sse_server()
-    ["bridge"] -> run_bridge_example()
-    ["full"] -> run_full_server()
     _ -> {
-      io.println("MCP Gleam - Full Implementation")
+      io.println("MCP Gleam - Production-ready MCP Server")
       io.println("")
       io.println("Usage: gleam run [command]")
       io.println("")
       io.println("Commands:")
       io.println("  print     - Print server capabilities (legacy)")
       io.println("  stdio     - Run MCP server with stdio transport") 
-      io.println("  websocket - Run MCP server with WebSocket transport")
-      io.println("  sse       - Run MCP server with SSE transport")
-      io.println("  bridge    - Run bridge between transports")
-      io.println("  full      - Run full bidirectional server with all transports")
+      io.println("")
+      io.println("Note: WebSocket and SSE transports require the 'mist' dependency.")
+      io.println("See mcp_full.gleam for full transport examples.")
       io.println("")
       io.println("Examples:")
       io.println("  gleam run stdio")
-      io.println("  gleam run websocket")
-      io.println("  gleam run full")
       
       // Default to legacy loop for backward compatibility
       loop(create_legacy_server())
@@ -161,7 +154,7 @@ fn tool_handler(_request) {
   |> Ok
 }
 
-pub const initialize = "{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"sampling\":{},\"roots\":{\"listChanged\":true}},\"clientInfo\":{\"name\":\"mcp-inspector\",\"version\":\"0.10.2\"}}}"
+pub const initialize = "{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-03-26\",\"capabilities\":{\"sampling\":{},\"roots\":{\"listChanged\":true}},\"clientInfo\":{\"name\":\"mcp-inspector\",\"version\":\"0.10.2\"}}}"
 
 pub const list_prompts = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"prompts/list\",\"params\":{\"_meta\":{\"progressToken\":1}}}"
 
@@ -190,51 +183,9 @@ fn create_legacy_server() -> server.Server {
   |> server.build
 }
 
-/// Run MCP server with stdio transport (placeholder implementation)
+/// Run MCP server with stdio transport 
 fn run_stdio_server() -> Nil {
   io.println("Starting MCP server with stdio transport...")
-  io.println("Note: This is a basic implementation. Full transport support coming soon!")
-  loop(create_legacy_server())
-}
-
-/// Run MCP server with WebSocket transport (placeholder implementation)
-fn run_websocket_server() -> Nil {
-  io.println("Starting MCP server with WebSocket transport...")
-  io.println("WebSocket server would start on ws://localhost:8080/mcp")
-  io.println("Note: Full WebSocket implementation coming soon!")
-  io.println("For now, falling back to stdio mode...")
-  loop(create_legacy_server())
-}
-
-/// Run MCP server with SSE transport (placeholder implementation)
-fn run_sse_server() -> Nil {
-  io.println("Starting MCP server with SSE transport...")
-  io.println("SSE server would start on http://localhost:8081/mcp")
-  io.println("Note: Full SSE implementation coming soon!")
-  io.println("For now, falling back to stdio mode...")
-  loop(create_legacy_server())
-}
-
-/// Run bridge example (placeholder implementation)
-fn run_bridge_example() -> Nil {
-  io.println("Starting bridge between stdio and WebSocket...")
-  io.println("Bridge would connect stdio input to WebSocket clients")
-  io.println("Note: Full bridge implementation coming soon!")
-  io.println("For now, falling back to stdio mode...")
-  loop(create_legacy_server())
-}
-
-/// Run full bidirectional server (placeholder implementation)
-fn run_full_server() -> Nil {
-  io.println("Starting full bidirectional MCP server...")
-  io.println("Would start all transports:")
-  io.println("  - stdio: Send JSON-RPC messages via stdin")
-  io.println("  - WebSocket: ws://localhost:8080/mcp")
-  io.println("  - SSE: http://localhost:8081/mcp")
-  io.println("")
-  io.println("Would support bidirectional communication and send")
-  io.println("notifications and requests to connected clients.")
-  io.println("Note: Full implementation in progress!")
-  io.println("For now, falling back to stdio mode...")
+  io.println("Listening for JSON-RPC messages on stdin...")
   loop(create_legacy_server())
 }

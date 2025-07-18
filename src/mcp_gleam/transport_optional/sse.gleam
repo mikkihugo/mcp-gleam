@@ -10,7 +10,7 @@ import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
-import gleamcp/transport.{type TransportEvent, type TransportMessage}
+import mcp_gleam/transport.{type TransportEvent, type TransportMessage}
 import mist.{type Connection, type ResponseData}
 
 /// SSE connection state

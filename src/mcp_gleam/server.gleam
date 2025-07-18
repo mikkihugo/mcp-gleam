@@ -4,10 +4,10 @@ import gleam/dynamic/decode.{type Decoder, type Dynamic}
 import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string_tree.{type StringTree}
-import gleamcp/get_prompt
-import gleamcp/mcp.{type McpError}
-import gleamcp/read_resource
-import gleamcp/resource
+import mcp_gleam/get_prompt
+import mcp_gleam/mcp.{type McpError}
+import mcp_gleam/read_resource
+import mcp_gleam/resource
 
 pub type Body {
   Text(StringTree)

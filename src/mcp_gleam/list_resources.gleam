@@ -1,8 +1,8 @@
 import gleam/dynamic/decode
 import gleam/json
 import gleam/option.{type Option, None, Some}
-import gleamcp/internal
-import gleamcp/resource.{type Resource}
+import mcp_gleam/internal
+import mcp_gleam/resource.{type Resource}
 
 pub type Request {
   Request(next_cursor: Option(String))

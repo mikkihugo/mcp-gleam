@@ -4,7 +4,7 @@ import gleam/dynamic/decode.{type Decoder}
 import gleam/function
 import gleam/json.{type Json}
 import gleam/option.{type Option}
-import gleamcp/json_schema
+import mcp_gleam/json_schema
 import jsonrpc
 
 // 2025-03-26

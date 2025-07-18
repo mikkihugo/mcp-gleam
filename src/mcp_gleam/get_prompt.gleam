@@ -1,9 +1,9 @@
 import gleam/dynamic/decode.{type Decoder}
 import gleam/json.{type Json}
 import gleam/option.{type Option, None, Some}
-import gleamcp/content.{type Content}
-import gleamcp/internal
-import gleamcp/role.{type Role}
+import mcp_gleam/content.{type Content}
+import mcp_gleam/internal
+import mcp_gleam/role.{type Role}
 
 pub type Request(arguments) {
   Request(name: String, arguments: Option(arguments))

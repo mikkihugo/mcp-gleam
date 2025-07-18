@@ -7,7 +7,7 @@ import gleam/option.{type Option, None, Some}
 import gleam/otp/actor
 import gleam/result
 import gleam/string
-import gleamcp/transport.{type Transport, type TransportEvent, type TransportMessage, type TransportInterface}
+import mcp_gleam/transport.{type Transport, type TransportEvent, type TransportMessage, type TransportInterface}
 
 /// Bridge configuration for connecting different transports
 pub type Bridge {

@@ -1,71 +1,97 @@
-# gleamcp
+# MCP Gleam
 
-[![Package Version](https://img.shields.io/hexpm/v/gleamcp)](https://hex.pm/packages/gleamcp)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/gleamcp/)
+[![Package Version](https://img.shields.io/hexpm/v/mcp_gleam)](https://hex.pm/packages/mcp_gleam)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/mcp_gleam/)
 
-A full-featured Model Context Protocol (MCP) server implementation in Gleam supporting multiple transports and bidirectional communication.
+A production-ready Model Context Protocol (MCP) server implementation in Gleam with support for multiple transports.
 
 ## Features
 
-- **Multiple Transport Support**: stdio, WebSocket, and Server-Sent Events (SSE)
-- **Bidirectional Communication**: Server-initiated requests and notifications
-- **Transport Bridging**: Connect different transports together
-- **Full MCP Protocol Compliance**: Support for resources, tools, prompts, and sampling
-- **Resource Subscriptions**: Real-time updates for resource changes
+- **Production-Ready**: Clean, minimal codebase designed for production use
+- **Multiple Transport Support**: stdio (core), WebSocket, and Server-Sent Events (SSE) (optional)
+- **Optional Dependencies**: Use only what you need - stdio works without any HTTP dependencies
+- **Full MCP Protocol Compliance**: Latest 2025-03-26 specification with backward compatibility
+- **Resource, Tools & Prompts**: Complete implementation of MCP capabilities
 - **Extensible Architecture**: Easy to add new transports and capabilities
 
 ## Quick Start
 
+### Stdio Only (No External Dependencies)
+
 ```sh
-gleam add gleamcp@1
+gleam add mcp_gleam
 ```
 
-### Basic Usage
+For stdio-only usage (most common), no additional dependencies are needed:
 
 ```gleam
-import gleamcp
+import mcp_gleam
 
 pub fn main() -> Nil {
   // Run with stdio transport (default)
-  gleamcp.main()
+  mcp_gleam.main()
 }
 ```
 
-### Available Commands
+### With WebSocket/SSE Support
+
+To enable WebSocket and SSE transports, add the `mist` dependency:
 
 ```sh
-# Traditional stdio transport
-gleam run stdio
+gleam add mist
+```
+### Basic Usage Examples
 
+#### Stdio Transport (Core)
+
+```sh
+# Default stdio mode
+gleam run
+
+# Explicit stdio mode  
+gleam run stdio
+```
+
+#### WebSocket/SSE (Requires mist dependency)
+
+For full transport support, see `mcp_full.gleam`:
+
+```sh
 # WebSocket server on localhost:8080
-gleam run websocket
+gleam run -m mcp_full websocket
 
 # Server-Sent Events on localhost:8081  
-gleam run sse
+gleam run -m mcp_full sse
 
-# Bridge between stdio and WebSocket
-gleam run bridge
-
-# Full server with all transports and bidirectional support
-gleam run full
-
-# Print server capabilities (legacy)
-gleam run print
+# Full server with all transports
+gleam run -m mcp_full full
 ```
+
+## Architecture
+
+### Core (stdio-only)
+- **mcp_gleam**: Main entry point with stdio transport
+- **mcp_gleam/transport**: Transport abstraction (stdio implementation)
+- **mcp_gleam/server**: MCP server implementation
+- **mcp_gleam/mcp**: Protocol types and handlers
+
+### Optional (requires mist)
+- **mcp_gleam/transport_optional/websocket**: WebSocket transport
+- **mcp_gleam/transport_optional/sse**: Server-Sent Events transport
+- **mcp_gleam/transport_optional/bidirectional**: Bidirectional communication
+- **mcp_gleam/transport_optional/bridge**: Transport bridging
 
 ## Transport Types
 
-### Stdio Transport
+### Stdio Transport (Core)
 
-The traditional MCP transport using stdin/stdout for JSON-RPC communication.
+The traditional MCP transport using stdin/stdout for JSON-RPC communication. Works without any external dependencies.
 
 ```gleam
-import gleamcp/transport
+import mcp_gleam/transport
 
 let stdio_transport = transport.Stdio(transport.StdioTransport)
 ```
-
-### WebSocket Transport
 
 Real-time bidirectional communication over WebSocket.
 

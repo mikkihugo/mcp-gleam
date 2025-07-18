@@ -1,14 +1,16 @@
 import argv
+import gleam/dynamic/decode
+import gleam/erlang/process
 import gleam/io
-import gleam/list
+import gleam/json
 import gleam/option.{None, Some}
 import gleam/result
-import gleamcp/bidirectional
-import gleamcp/bridge
-import gleamcp/mcp
-import gleamcp/resource
-import gleamcp/server
-import gleamcp/transport
+import mcp_gleam/bidirectional
+import mcp_gleam/bridge
+import mcp_gleam/mcp
+import mcp_gleam/resource
+import mcp_gleam/server
+import mcp_gleam/transport
 
 /// Full MCP server example with multiple transports
 pub fn main() {
@@ -254,9 +256,9 @@ fn example_tool() -> mcp.Tool {
 }
 
 /// Example tool decoder
-fn example_tool_decoder() -> gleam/dynamic/decode.Decoder(EchoArgs) {
-  use message <- gleam/dynamic/decode.field("message", gleam/dynamic/decode.string)
-  gleam/dynamic/decode.success(EchoArgs(message:))
+fn example_tool_decoder() -> decode.Decoder(EchoArgs) {
+  use message <- decode.field("message", decode.string)
+  decode.success(EchoArgs(message:))
 }
 
 /// Example tool arguments type
@@ -294,7 +296,7 @@ fn stdio_message_loop(server: server.Server, transport_interface: transport.Tran
       case server.handle_message(server, message.content) {
         Ok(Some(response)) -> {
           let response_msg = transport.TransportMessage(
-            content: gleam/json.to_string(response),
+            content: json.to_string(response),
             id: message.id,
           )
           let _ = transport_interface.send(response_msg)
@@ -303,7 +305,7 @@ fn stdio_message_loop(server: server.Server, transport_interface: transport.Tran
         Ok(None) -> Nil
         Error(error_response) -> {
           let error_msg = transport.TransportMessage(
-            content: gleam/json.to_string(error_response),
+            content: json.to_string(error_response),
             id: message.id,
           )
           let _ = transport_interface.send(error_msg)
@@ -325,5 +327,5 @@ fn stdio_message_loop(server: server.Server, transport_interface: transport.Tran
 
 /// Wait forever (for server processes)
 fn wait_forever() -> Nil {
-  gleam/erlang/process.sleep_forever()
+  process.sleep_forever()
 }
