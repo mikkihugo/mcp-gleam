@@ -1,6 +1,8 @@
 {
-  "name": "Gleam Development Environment",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "name": "Gleam Development Environment (Latest)",
+  // Use the official Erlang image with the floating tag for OTP 28.
+  // This will always pull the latest patch release for version 28.
+  "image": "erlang:28",
 
   "customizations": {
     "vscode": {
@@ -18,7 +20,8 @@
     }
   },
 
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y erlang-dev erlang-parsetools curl && curl -L -o gleam.tar.gz https://github.com/gleam-lang/gleam/releases/download/v1.3.1/gleam-v1.3.1-x86_64-unknown-linux-musl.tar.gz && sudo tar -xzf gleam.tar.gz -C /usr/local/bin && rm gleam.tar.gz && gleam deps download",
+  // This command sequence now dynamically finds and installs the latest Gleam release.
+  "postCreateCommand": "apt-get update && apt-get install -y curl jq && LATEST_GLEAM_URL=$(curl -s https://api.github.com/repos/gleam-lang/gleam/releases/latest | jq -r '.assets[] | select(.name | endswith(\"x86_64-unknown-linux-musl.tar.gz\")) | .browser_download_url') && curl -L -o gleam.tar.gz \"$LATEST_GLEAM_URL\" && tar -xzf gleam.tar.gz -C /usr/local/bin && rm gleam.tar.gz && gleam deps download",
 
-  "forwardPorts": [4000]
+  "forwardPorts": [4020]
 }
