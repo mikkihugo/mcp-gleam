@@ -1,8 +1,7 @@
 {
-  "name": "Gleam Development Environment (Latest)",
-  // Use the official Erlang image with the floating tag for OTP 28.
-  // This will always pull the latest patch release for version 28.
-  "image": "erlang:28",
+  "name": "Gleam Development Environment (Elixir Base)",
+  // Use the latest official Elixir image, which includes Erlang.
+  "image": "elixir:latest",
 
   "customizations": {
     "vscode": {
@@ -20,8 +19,9 @@
     }
   },
 
-  // This command sequence now dynamically finds and installs the latest Gleam release.
+  // This command now only needs to install dependencies for the script,
+  // then dynamically find and install the latest Gleam release.
   "postCreateCommand": "apt-get update && apt-get install -y curl jq && LATEST_GLEAM_URL=$(curl -s https://api.github.com/repos/gleam-lang/gleam/releases/latest | jq -r '.assets[] | select(.name | endswith(\"x86_64-unknown-linux-musl.tar.gz\")) | .browser_download_url') && curl -L -o gleam.tar.gz \"$LATEST_GLEAM_URL\" && tar -xzf gleam.tar.gz -C /usr/local/bin && rm gleam.tar.gz && gleam deps download",
 
-  "forwardPorts": [4020]
+  "forwardPorts": [4000]
 }
