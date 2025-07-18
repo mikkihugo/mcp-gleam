@@ -1,29 +1,21 @@
-# .github/workflows/release.yml
 # Continuous Deployment: Publishes the package to Hex.pm.
 # This workflow is triggered MANUALLY when a new release is created in the GitHub UI.
-
 name: Release
 
 on:
   release:
-    # This trigger starts the workflow only when a release is published.
-    # It will not run on drafts.
     types: [published]
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      # Required for publishing to package registries
       contents: read
     steps:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Disable firewall
-        run: sudo ufw disable
-
-      - name: Set up BEAM tools
+      - name: Set up BEAM Environment
         uses: erlef/setup-beam@v1
         with:
           otp-version: "28"
@@ -33,13 +25,10 @@ jobs:
       - name: Download dependencies
         run: gleam deps download
 
-      # Run tests again as a final verification before publishing
       - name: Run final tests
         run: gleam test
 
-      # The 'gleam publish' command automatically handles compilation and optimization.
-      # It requires a HEX_API_KEY secret to be set in your repository settings.
-      # Settings > Secrets and variables > Actions > New repository secret
+      # Requires a HEX_API_KEY secret to be set in repository settings.
       - name: Publish to Hex.pm
         run: gleam publish --yes
         env:
