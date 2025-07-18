@@ -32,8 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Optional dependencies (mist only required for WebSocket/SSE)
   - Pluggable transport system for easy extension
 - **Enterprise Features**:
-  - Health check endpoints
-  - Performance metrics
   - Security features (input validation, CORS support)
   - Docker deployment support
   - Environment-based configuration
@@ -92,7 +90,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Build System**: Improved build configuration with multiple targets
 - **CI/CD**: Comprehensive testing and validation pipeline
 - **Docker Support**: Production-ready Docker configuration
-- **Monitoring**: Health checks and metrics endpoints
 
 ## [0.1.0] - 2023-12-01 (Previous Version)
 

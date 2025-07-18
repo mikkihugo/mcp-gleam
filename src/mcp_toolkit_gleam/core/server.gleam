@@ -523,16 +523,15 @@ pub fn read_resource(
 ) -> Result(mcp.ReadResourceResult, json.Json) {
   case dict.get(server.resources, request.uri) {
     Ok(resource) -> {
-      // TODO
-      let assert Ok(res) = resource.handler(request)
-      Ok(res)
+      case resource.handler(request) {
+        Ok(res) -> Ok(res)
+        Error(err) -> Error(err)
+      }
     }
     Error(_) -> {
-      jsonrpc.invalid_params
-      // TODO
-      |> jsonrpc.error_response(jsonrpc.NullId)
-      |> jsonrpc.error_response_to_json(jsonrpc.nothing_to_json)
-      |> Error
+      Error(json.object([
+        #("error", json.string("Resource not found: " <> request.uri))
+      ]))
     }
   }
 }
@@ -553,16 +552,15 @@ pub fn get_prompt(
 ) -> Result(mcp.GetPromptResult, json.Json) {
   case dict.get(server.prompts, request.name) {
     Ok(prompt) -> {
-      // TODO
-      let assert Ok(res) = prompt.handler(request)
-      Ok(res)
+      case prompt.handler(request) {
+        Ok(res) -> Ok(res)
+        Error(err) -> Error(err)
+      }
     }
     Error(_) -> {
-      jsonrpc.invalid_params
-      // TODO
-      |> jsonrpc.error_response(jsonrpc.NullId)
-      |> jsonrpc.error_response_to_json(jsonrpc.nothing_to_json)
-      |> Error
+      Error(json.object([
+        #("error", json.string("Prompt not found: " <> request.name))
+      ]))
     }
   }
 }
@@ -583,16 +581,15 @@ pub fn call_tool(
 ) -> Result(mcp.CallToolResult, json.Json) {
   case dict.get(server.tools, request.name) {
     Ok(tool) -> {
-      // TODO
-      let assert Ok(res) = tool.handler(request)
-      Ok(res)
+      case tool.handler(request) {
+        Ok(res) -> Ok(res)
+        Error(err) -> Error(err)
+      }
     }
     Error(_) -> {
-      jsonrpc.invalid_params
-      // TODO
-      |> jsonrpc.error_response(jsonrpc.NullId)
-      |> jsonrpc.error_response_to_json(jsonrpc.nothing_to_json)
-      |> Error
+      Error(json.object([
+        #("error", json.string("Tool not found: " <> request.name))
+      ]))
     }
   }
 }
