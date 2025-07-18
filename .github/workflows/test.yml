@@ -1,23 +1,55 @@
+# .github/workflows/test.yml
+# This workflow runs tests for the Gleam project.
+
 name: test
 
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push events but only for the master and main branches
   push:
     branches:
       - master
       - main
+  # Triggers the workflow on pull request events
   pull_request:
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  # This workflow contains a single job called "test"
   test:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v4
-      - uses: erlef/setup-beam@v1
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Sets up Erlang/OTP, Gleam, and Rebar3
+      - name: Set up BEAM tools
+        uses: erlef/setup-beam@v1
         with:
-          otp-version: "27.1.2"
-          gleam-version: "1.10.0"
+          # Use the latest patch release of OTP 28
+          otp-version: "28"
+          # Use the latest v1 release of Gleam
+          gleam-version: "1"
+          # Use the latest v3 release of Rebar3
           rebar3-version: "3"
-          # elixir-version: "1"
-      - run: gleam deps download
-      - run: gleam test
-      - run: gleam format --check src test
+
+      # Disable the firewall on the runner to prevent potential network issues
+      - name: Disable firewall
+        run: sudo ufw disable
+
+      # Downloads the project's dependencies
+      - name: Download dependencies
+        run: gleam deps download
+
+      # Runs the test suite. This will automatically detect and run both
+      # gleeunit and birdie tests if they are present in the project.
+      - name: Run tests
+        run: gleam test
+
+      # Checks if the code is formatted according to the Gleam style guide
+      - name: Check formatting
+        run: gleam format --check src test
