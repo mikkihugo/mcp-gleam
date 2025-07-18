@@ -5,7 +5,7 @@ Production-ready Model Context Protocol (MCP) Toolkit implementation in Gleam wi
 ## 🎯 Features
 
 ### Multi-Transport Support
-- **stdio**: Dependency-free standard input/output transport
+- **stdio**: Standard input/output transport
 - **WebSocket**: Real-time bidirectional communication on `ws://localhost:8080/mcp`
 - **Server-Sent Events (SSE)**: Server-to-client streaming on `http://localhost:8081/mcp`
 - **Transport Bridging**: Connect any two transports with filtering and transformation
@@ -15,7 +15,7 @@ Production-ready Model Context Protocol (MCP) Toolkit implementation in Gleam wi
 - **Comprehensive Testing**: Full test coverage with birdie snapshots and gleunit
 - **Type Safety**: Strong typing throughout with comprehensive error handling
 - **Modular Design**: Clean separation between core protocol and transport layers
-- **Optional Dependencies**: Core functionality works without external dependencies
+- **Production-Ready**: Comprehensive error handling and logging throughout
 
 ### Enterprise Features
 - Bidirectional communication with server-initiated requests
@@ -28,25 +28,15 @@ Production-ready Model Context Protocol (MCP) Toolkit implementation in Gleam wi
 
 ### Installation
 
-#### For Stdio Transport Only (Dependency-Free)
 ```bash
-# Comment out mist dependency in gleam.toml for minimal installation
-gleam build
-gleam run -- mcpstdio
-```
-
-#### For Full Transport Support
-```bash
-# Includes WebSocket and SSE transports
 gleam deps download
 gleam build
-gleam run -- mcpserver [transport]
 ```
 
 ### Usage Examples
 
 ```bash
-# Stdio transport (no external dependencies)
+# Stdio transport
 gleam run -- mcpstdio
 
 # WebSocket server
@@ -66,17 +56,17 @@ gleam run -- mcpserver full
 
 ```
 src/
-├── mcpstdio.gleam              # Stdio-only executable (dependency-free)
-├── mcpserver.gleam             # Full server executable
+├── mcpstdio.gleam              # Stdio executable
+├── mcpserver.gleam             # Full server executable  
 └── mcp_toolkit_gleam/
     ├── core/                   # Core protocol implementation
     │   ├── protocol.gleam      # MCP protocol types and functions
     │   ├── server.gleam        # Server implementation
     │   ├── method.gleam        # MCP method constants
     │   └── json_schema*.gleam  # JSON schema handling
-    ├── transport/              # Core transports (no external deps)
+    ├── transport/              # Core transports
     │   └── stdio.gleam         # Standard I/O transport
-    └── transport_optional/     # Optional transports (require mist)
+    └── transport_optional/     # HTTP/WebSocket transports
         ├── websocket.gleam     # WebSocket transport
         ├── sse.gleam          # Server-Sent Events transport
         ├── bidirectional.gleam # Bidirectional communication
@@ -152,20 +142,19 @@ gleam test --coverage
 
 ## 🔧 Dependencies
 
-### Core Dependencies (Required)
+### Dependencies
 ```toml
+# Core protocol dependencies
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 gleam_http = ">= 4.0.0 and < 5.0.0"
 gleam_json = ">= 2.3.0 and < 3.0.0"
 jsonrpc = ">= 1.0.0 and < 2.0.0"
 justin = ">= 1.0.1 and < 2.0.0"
 gleam_erlang = ">= 0.34.0 and < 1.0.0"
-```
 
-### Optional Dependencies
-```toml
-# Only needed for WebSocket/SSE transports
+# HTTP/WebSocket transport dependencies
 mist = ">= 3.0.0 and < 4.0.0"
+wisp = ">= 0.17.0 and < 1.0.0"
 ```
 
 ### Development Dependencies
@@ -203,12 +192,6 @@ export MCP_SSE_PORT=8081
 export MCP_CORS_ENABLED=true
 export MCP_AUTH_ENABLED=false
 ```
-
-### Health Checks
-The server provides health check endpoints:
-- `GET /health` - Basic health status
-- `GET /metrics` - Performance metrics
-- `GET /version` - Protocol and server version
 
 ## 🔒 Security
 
