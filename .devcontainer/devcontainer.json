@@ -1,23 +1,17 @@
 {
   "name": "Gleam Development Environment",
-  // Use the official Erlang image as a base
   "image": "erlang:27-alpine",
-
   "features": {
-    // Add Gleam to the environment
     "ghcr.io/gleam-lang/devcontainer-feature/gleam:1": {}
   },
-
   "customizations": {
     "vscode": {
       "settings": {
-        // Enable format on save for Gleam files
         "editor.formatOnSave": true,
         "[gleam]": {
           "editor.defaultFormatter": "gleam.gleam"
         }
       },
-      // Install recommended extensions for Gleam and AI assistance
       "extensions": [
         "gleam.gleam",
         "github.copilot",
@@ -25,10 +19,6 @@
       ]
     }
   },
-
-  // Forward the port for any potential web server in your app
   "forwardPorts": [4000],
-
-  // Run commands after the container is created
   "postCreateCommand": "gleam deps download"
 }
