@@ -1,7 +1,12 @@
 {
-  "name": "Gleam Development Environment (Elixir Base)",
-  // Use the latest official Elixir image, which includes Erlang.
-  "image": "elixir:latest",
+  "name": "Gleam Development Environment (Latest)",
+  // Use the ":latest" tag to pull the most recent build of the Elixir image.
+  "image": "mcr.microsoft.com/devcontainers/elixir:latest",
+
+  // Use a "feature" to add the latest v1 release of the Gleam compiler.
+  "features": {
+    "ghcr.io/gleam-lang/devcontainer-feature/gleam:1": {}
+  },
 
   "customizations": {
     "vscode": {
@@ -19,9 +24,8 @@
     }
   },
 
-  // This command now only needs to install dependencies for the script,
-  // then dynamically find and install the latest Gleam release.
-  "postCreateCommand": "apt-get update && apt-get install -y curl jq && LATEST_GLEAM_URL=$(curl -s https://api.github.com/repos/gleam-lang/gleam/releases/latest | jq -r '.assets[] | select(.name | endswith(\"x86_64-unknown-linux-musl.tar.gz\")) | .browser_download_url') && curl -L -o gleam.tar.gz \"$LATEST_GLEAM_URL\" && tar -xzf gleam.tar.gz -C /usr/local/bin && rm gleam.tar.gz && gleam deps download",
+  // This command runs after the container is created and all features are installed.
+  "postCreateCommand": "gleam deps download",
 
   "forwardPorts": [4000]
 }
