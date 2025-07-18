@@ -1,0 +1,49 @@
+# .github/workflows/ci.yml
+# Continuous Integration: Runs tests and formatting checks on every push and PR.
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # This step disables the firewall to prevent network block errors.
+      - name: Disable firewall
+        run: sudo ufw disable
+
+      - name: Set up BEAM tools
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "28"
+          gleam-version: "1"
+          rebar3-version: "3"
+
+      # Cache dependencies to speed up future runs
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: build/packages
+          key: gleam-deps-${{ hashFiles('gleam.lock') }}
+
+      - name: Download dependencies
+        run: gleam deps download
+
+      - name: Run tests
+        run: gleam test
+
+      - name: Check formatting
+        run: gleam format --check src test
+
+# Note on "Fixes #3":
+# To close GitHub issues automatically, you don't need special workflow configuration.
+# Simply include "Fixes #3", "Closes #3", or "Resolves #3" in the commit message
+# or pull request description of the code that fixes the issue.
