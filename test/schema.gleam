@@ -1,6 +1,6 @@
 import gleam/dynamic/decode
 import gleam/json
-import gleamcp/tool
+import mcp_gleam/tool
 
 type Box {
   Box(foo: Int, schema: tool.InputSchema)

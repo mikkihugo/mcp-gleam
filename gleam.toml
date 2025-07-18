@@ -1,23 +1,31 @@
-name = "gleamcp"
+name = "mcp_toolkit_gleam"
 version = "1.0.0"
 
-# Fill out these fields if you intend to generate HTML documentation or publish
-# your project to the Hex package manager.
-#
-# description = ""
-# licences = ["Apache-2.0"]
-# repository = { type = "github", user = "", repo = "" }
-# links = [{ title = "Website", href = "" }]
-#
-# For a full reference of all the available options, you can have a look at
-# https://gleam.run/writing-gleam/gleam-toml/.
+description = "Production-ready Model Context Protocol (MCP) Toolkit - comprehensive server implementation in Gleam"
+licences = ["Apache-2.0"]
+repository = { type = "github", user = "mikkihugo", repo = "mcp-gleam" }
 
+# Core dependencies (required for all functionality)
 [dependencies]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 gleam_http = ">= 4.0.0 and < 5.0.0"
 gleam_json = ">= 2.3.0 and < 3.0.0"
 jsonrpc = ">= 1.0.0 and < 2.0.0"
 justin = ">= 1.0.1 and < 2.0.0"
+gleam_erlang = ">= 0.34.0 and < 1.0.0"
+
+# Optional dependencies (only needed for WebSocket/SSE transports)
+# Comment out if you only need stdio transport
+mist = ">= 3.0.0 and < 4.0.0"
+
+# Build targets
+[[binaries]]
+name = "mcpstdio"
+path = "./src/mcpstdio.gleam"
+
+[[binaries]]
+name = "mcpserver"
+path = "./src/mcpserver.gleam"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
