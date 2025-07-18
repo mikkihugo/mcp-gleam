@@ -1,4 +1,63 @@
+# Compiled files
 *.beam
 *.ez
 /build
 erl_crash.dump
+
+# Dependencies
+/deps
+
+# Development and testing
+/.gleam
+/erl_crash.dump
+/_build/
+/tmp/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/logs/
+
+# Coverage reports
+/coverage/
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+/dist/
+/target/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Backup files
+*.bak
+*.backup
+
+# Test artifacts
+/test_results/
+/snapshots_old/
+
+# Security
+*.pem
+*.key
+*.crt

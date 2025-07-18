@@ -1,7 +1,7 @@
-name = "mcp_gleam"
+name = "mcp_toolkit_gleam"
 version = "1.0.0"
 
-description = "Production-ready Model Context Protocol (MCP) server implementation in Gleam"
+description = "Production-ready Model Context Protocol (MCP) Toolkit - comprehensive server implementation in Gleam"
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "mikkihugo", repo = "mcp-gleam" }
 
@@ -17,6 +17,15 @@ gleam_erlang = ">= 0.34.0 and < 1.0.0"
 # Optional dependencies (only needed for WebSocket/SSE transports)
 # Comment out if you only need stdio transport
 mist = ">= 3.0.0 and < 4.0.0"
+
+# Build targets
+[[binaries]]
+name = "mcpstdio"
+path = "./src/mcpstdio.gleam"
+
+[[binaries]]
+name = "mcpserver"
+path = "./src/mcpserver.gleam"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
