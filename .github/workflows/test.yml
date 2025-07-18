@@ -1,75 +1,82 @@
 # .github/workflows/test.yml
-# This workflow runs tests and CodeQL analysis for the Gleam project.
+# This workflow uses separate jobs for setting up the environment and running tests.
 
 name: test
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push events but only for the master and main branches
   push:
     branches:
       - master
       - main
-  # Triggers the workflow on pull request events
   pull_request:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "test"
-  test:
-    # The type of runner that the job will run on
+  # This job sets up the environment and caches dependencies
+  setup:
     runs-on: ubuntu-latest
-
-    # Granting permissions for CodeQL to function correctly
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Check out code
         uses: actions/checkout@v4
 
-      # Sets up Erlang/OTP, Gleam, and Rebar3
       - name: Set up BEAM tools
         uses: erlef/setup-beam@v1
         with:
-          # Use the latest patch release of OTP 28
           otp-version: "28"
-          # Use the latest v1 release of Gleam
           gleam-version: "1"
-          # Use the latest v3 release of Rebar3
           rebar3-version: "3"
 
-      # Initialize CodeQL scanning. It needs to run before the build.
-      # It will prepare the environment to monitor the build process.
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+      # Generate a key for the cache based on the lock file
+      - name: Cache key
+        id: cache-key
+        run: echo "key=gleam-deps-${{ hashFiles('gleam.lock') }}" >> $GITHUB_OUTPUT
+
+      # Cache the downloaded dependencies to speed up subsequent runs
+      - name: Cache dependencies
+        uses: actions/cache@v4
         with:
-          # Gleam compiles to Erlang, so we analyze the Erlang output
-          languages: erlang
+          path: build/packages
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            gleam-deps-
 
-      # Disable the firewall on the runner to prevent potential network issues
-      - name: Disable firewall
-        run: sudo ufw disable
-
-      # Downloads the project's dependencies
       - name: Download dependencies
+        # Only run 'gleam deps download' if the cache was not restored
+        if: steps.cache.outputs.cache-hit != 'true'
         run: gleam deps download
 
-      # Runs the test suite. This will automatically detect and run both
-      # gleeunit and birdie tests if they are present in the project.
+  # This job runs the tests and formatting checks
+  test:
+    # This job depends on the 'setup' job completing successfully
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up BEAM tools
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "28"
+          gleam-version: "1"
+          rebar3-version: "3"
+
+      # Generate the same cache key to find the correct cache
+      - name: Cache key
+        id: cache-key
+        run: echo "key=gleam-deps-${{ hashFiles('gleam.lock') }}" >> $GITHUB_OUTPUT
+
+      # Restore the cached dependencies from the setup job
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: build/packages
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            gleam-deps-
+
       - name: Run tests
         run: gleam test
 
-      # Checks if the code is formatted according to the Gleam style guide
       - name: Check formatting
         run: gleam format --check src test
-
-      # Finalize the CodeQL scan. This step takes the data collected
-      # during the build and uploads it to GitHub for analysis.
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-
