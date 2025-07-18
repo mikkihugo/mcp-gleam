@@ -1,9 +1,8 @@
 {
   "name": "Gleam Development Environment",
-  "image": "erlang:27-alpine",
-  "features": {
-    "ghcr.io/gleam-lang/devcontainer-feature/gleam:1": {}
-  },
+  // Use a standard Ubuntu image as a base
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
   "customizations": {
     "vscode": {
       "settings": {
@@ -19,6 +18,10 @@
       ]
     }
   },
-  "forwardPorts": [4000],
-  "postCreateCommand": "gleam deps download"
+
+  // This block runs after the container is created.
+  // It manually installs Erlang and Gleam, which is more reliable.
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y erlang-dev erlang-parsetools && sudo apt-get install -y curl && curl -L -o gleam.tar.gz https://github.com/gleam-lang/gleam/releases/download/v1.3.1/gleam-v1.3.1-x86_64-unknown-linux-musl.tar.gz && sudo tar -xzf gleam.tar.gz -C /usr/local/bin && rm gleam.tar.gz && gleam deps download",
+
+  "forwardPorts": [4000]
 }
