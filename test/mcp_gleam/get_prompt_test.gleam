@@ -1,10 +1,10 @@
 import birdie
 import gleam/dynamic/decode.{type Decoder}
 import gleam/json.{type Json}
-import gleamcp/content
-import gleamcp/get_prompt
-import gleamcp/prompt
-import gleamcp/role
+import mcp_gleam/content
+import mcp_gleam/get_prompt
+import mcp_gleam/prompt
+import mcp_gleam/role
 import gleeunit/should
 
 fn test_case(

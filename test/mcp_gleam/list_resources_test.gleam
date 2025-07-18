@@ -1,8 +1,8 @@
 import birdie
 import gleam/dynamic/decode.{type Decoder}
 import gleam/json.{type Json}
-import gleamcp/list_resources
-import gleamcp/resource
+import mcp_gleam/list_resources
+import mcp_gleam/resource
 import gleeunit/should
 
 fn test_case(

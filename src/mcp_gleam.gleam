@@ -176,7 +176,7 @@ fn echo(x: t) -> t {
 
 /// Create the legacy server for backward compatibility
 fn create_legacy_server() -> server.Server {
-  server.new("test", "1.0.0")
+  server.new("MCP Gleam Server", "1.0.0")
   |> server.add_prompt(prompt(), prompt_handler)
   |> server.add_resource(resource(), resource_handler)
   |> server.add_tool(tool(), get_weather_decoder(), tool_handler)

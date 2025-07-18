@@ -8,7 +8,7 @@ import mcp_gleam/json_schema
 import jsonrpc
 
 // 2025-03-26
-pub const protocol_version = "2024-11-05"
+pub const protocol_version = "2025-03-26"
 
 pub type McpError {
   ParseError

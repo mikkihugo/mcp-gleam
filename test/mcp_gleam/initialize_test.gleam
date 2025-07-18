@@ -1,7 +1,7 @@
 import birdie
 import gleam/dynamic/decode.{type Decoder}
 import gleam/json.{type Json}
-import gleamcp/initialize
+import mcp_gleam/initialize
 import gleeunit/should
 
 fn test_case(

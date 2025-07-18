@@ -1,37 +1,37 @@
 /// Initiates connection and negotiates protocol capabilities.
-/// https://modelcontextprotocol.io/specification/2024-11-05/basic/lifecycle/#initialization
+/// https://modelcontextprotocol.io/specification/2025-03-26/basic/lifecycle/#initialization
 pub const initialize = "initialize"
 
 /// Verifies connection liveness between client and server.
-/// https://modelcontextprotocol.io/specification/2024-11-05/basic/utilities/ping/
+/// https://modelcontextprotocol.io/specification/2025-03-26/basic/utilities/ping/
 pub const ping = "ping"
 
 /// Lists all available server resources.
-/// https://modelcontextprotocol.io/specification/2024-11-05/server/resources/
+/// https://modelcontextprotocol.io/specification/2025-03-26/server/resources/
 pub const resources_list = "resources/list"
 
 /// Provides URI templates for constructing resource URIs.
-/// https://modelcontextprotocol.io/specification/2024-11-05/server/resources/
+/// https://modelcontextprotocol.io/specification/2025-03-26/server/resources/
 pub const resources_templates_list = "resources/templates/list"
 
 /// Retrieves content of a specific resource by URI.
-/// https://modelcontextprotocol.io/specification/2024-11-05/server/resources/
+/// https://modelcontextprotocol.io/specification/2025-03-26/server/resources/
 pub const resources_read = "resources/read"
 
 /// Lists all available prompt templates.
-/// https://modelcontextprotocol.io/specification/2024-11-05/server/prompts/
+/// https://modelcontextprotocol.io/specification/2025-03-26/server/prompts/
 pub const prompts_list = "prompts/list"
 
 /// Retrieves a specific prompt template with filled parameters.
-/// https://modelcontextprotocol.io/specification/2024-11-05/server/prompts/
+/// https://modelcontextprotocol.io/specification/2025-03-26/server/prompts/
 pub const prompts_get = "prompts/get"
 
 /// Lists all available executable tools.
-/// https://modelcontextprotocol.io/specification/2024-11-05/server/tools/
+/// https://modelcontextprotocol.io/specification/2025-03-26/server/tools/
 pub const tools_list = "tools/list"
 
 /// Invokes a specific tool with provided parameters.
-/// https://modelcontextprotocol.io/specification/2024-11-05/server/tools/
+/// https://modelcontextprotocol.io/specification/2025-03-26/server/tools/
 pub const tools_call = "tools/call"
 
 /// Notifies when the list of available resources changes.
@@ -45,7 +45,7 @@ pub const notification_resource_updated = "notifications/resources/updated"
 pub const notification_prompts_list_changed = "notifications/prompts/list_changed"
 
 /// Notifies when the list of available tools changes.
-/// https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/list_changed/
+/// https://spec.modelcontextprotocol.io/specification/2025-03-26/server/tools/list_changed/
 pub const notification_tools_list_changed = "notifications/tools/list_changed"
 
 /// Notifies that a previously-issued request is cancelled.
