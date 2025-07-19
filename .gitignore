@@ -7,6 +7,10 @@ erl_crash.dump
 # Dependencies
 /deps
 
+# Downloaded packages
+*.tar.gz
+gleam-*
+
 # Development and testing
 /.gleam
 /erl_crash.dump
