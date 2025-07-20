@@ -1,5 +1,5 @@
-# Continuous Integration: Uses a Copilot agent with a dedicated setup phase.
-name: CI (Copilot Agent)
+# Continuous Integration
+name: CI
 
 on:
   push:
@@ -13,23 +13,22 @@ jobs:
     permissions:
       contents: read
       
-    copilot:
-      # These steps run BEFORE the agent's main execution and firewall lockdown.
-      # This is the correct place to install tools from the internet.
-      setup-steps:
-        - name: Set up BEAM Environment
-          uses: erlef/setup-beam@v1
-          with:
-            otp-version: "28"
-            gleam-version: "1"
-            rebar3-version: "3"
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
 
-      # These steps are executed by the Copilot agent inside its secure environment.
-      steps:
-        - name: Check out code
-          uses: actions/checkout@v4
+      - name: Set up BEAM Environment
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "28"
+          gleam-version: "1"
+          rebar3-version: "3"
 
-        # The agent is told to perform its tasks within the pre-configured environment.
-        - name: Download Dependencies, Test, and Format
-          run: |
-            copilot:assist "My environment is now set up with Gleam and Erlang. First, download the project dependencies. Then, run the test suite. Finally, check the code formatting."
+      - name: Download Dependencies
+        run: gleam deps download
+
+      - name: Run Tests
+        run: gleam test
+
+      - name: Check Formatting
+        run: gleam format --check
