@@ -1,5 +1,0 @@
----
-version: 1.2.7
-title: initialize response with everything
----
-{"instructions":"do stuff","protocolVersion":"2024-11-05","serverInfo":{"name":"server","version":"1.0.0"},"capabilities":{"tools":{"listChanged":true},"prompts":{"listChanged":false},"resources":{"listChanged":true,"subscribe":false},"logging":{},"completions":{}}}

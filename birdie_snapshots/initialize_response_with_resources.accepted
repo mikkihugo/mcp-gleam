@@ -1,5 +1,0 @@
----
-version: 1.2.7
-title: initialize response with resources
----
-{"protocolVersion":"2024-11-05","serverInfo":{"name":"server","version":"1.0.0"},"capabilities":{"resources":{"listChanged":true,"subscribe":false}}}

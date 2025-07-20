@@ -10,6 +10,10 @@ import gleeunit/should
 import mcp_toolkit_gleam/core/protocol as mcp
 import mcp_toolkit_gleam/core/server
 
+pub type SearchInput {
+  SearchInput(query: String, limit: option.Option(Int))
+}
+
 pub fn main() {
   gleeunit.main()
 }
@@ -27,9 +31,13 @@ pub fn prompt_flow_integration_test() {
   let prompt = mcp.Prompt(
     name: "integration_prompt",
     description: Some("Test prompt for integration"),
-    arguments: Some(json.object([
-      #("param1", json.string("value1"))
-    ]))
+    arguments: Some([
+      mcp.PromptArgument(
+        name: "param1",
+        description: Some("Parameter 1"),
+        required: Some(True),
+      ),
+    ])
   )
   
   let handler = fn(_request) {
@@ -45,9 +53,7 @@ pub fn prompt_flow_integration_test() {
         ),
       ],
       description: Some("Integration test result"),
-      meta: Some(json.object([
-        #("test", json.string("integration"))
-      ])),
+      meta: Some(mcp.Meta(progress_token: Some(mcp.ProgressTokenString("integration")))),
     ) |> Ok
   }
   
@@ -82,10 +88,7 @@ pub fn resource_flow_integration_test() {
           mime_type: Some("text/markdown"),
         )),
       ],
-      meta: Some(json.object([
-        #("test", json.string("integration")),
-        #("size", json.int(1024))
-      ])),
+      meta: Some(mcp.Meta(progress_token: Some(mcp.ProgressTokenString("resource-integration")))),
     ) |> Ok
   }
   
@@ -118,21 +121,20 @@ pub fn tool_flow_integration_test() {
     name: "integration_search",
     input_schema: schema,
     description: Some("Search tool for integration testing"),
-    annotations: Some(mcp.Annotations(
-      audience: Some([mcp.User, mcp.Assistant]),
-      priority: Some(1.0),
+    annotations: Some(mcp.ToolAnnotations(
+      destructive_hint: Some(False),
+      idempotent_hint: Some(True),
+      open_world_hint: Some(False),
+      read_only_hint: Some(True),
+      title: Some("Integration Search Tool"),
     )),
   )
   
-  pub type SearchInput {
-    SearchInput(query: String, limit: option.Option(Int))
+  let decoder = {
+    use query <- decode.field("query", decode.string)
+    use limit <- mcp.omittable_field("limit", decode.int)
+    decode.success(SearchInput(query, limit))
   }
-  
-  let decoder = decode.decode2(
-    SearchInput,
-    decode.field("query", decode.string),
-    decode.optional_field("limit", decode.int)
-  )
   
   let handler = fn(_request) {
     mcp.CallToolResult(
@@ -144,10 +146,7 @@ pub fn tool_flow_integration_test() {
         )),
       ],
       is_error: Some(False),
-      meta: Some(json.object([
-        #("test", json.string("integration")),
-        #("results_count", json.int(2))
-      ])),
+      meta: Some(mcp.Meta(progress_token: Some(mcp.ProgressTokenString("integration-test")))),
     ) |> Ok
   }
   
@@ -218,14 +217,12 @@ pub fn complex_data_integration_test() {
       ),
     ],
     description: Some("Complex multi-modal prompt result"),
-    meta: Some(json.object([
-      #("complexity", json.string("high")),
-      #("modalities", json.array([json.string("text"), json.string("image")])),
-      #("test_type", json.string("integration"))
-    ])),
+    meta: Some(mcp.Meta(progress_token: Some(mcp.ProgressTokenString("complex-prompt")))),
   )
   
-  complex_prompt_result.messages |> should.have_length(2)
+  complex_prompt_result.messages 
+  |> list.length 
+  |> should.equal(2)
   complex_prompt_result.description |> should.equal(Some("Complex multi-modal prompt result"))
 }
 
@@ -241,16 +238,16 @@ pub fn complete_integration_snapshot_test() {
       #("tools", json.bool(True)),
       #("bidirectional", json.bool(True))
     ])),
-    #("transports", json.array([
-      json.string("stdio"),
-      json.string("websocket"),
-      json.string("sse")
+    #("transports", json.array(of: json.string, from: [
+      "stdio",
+      "websocket", 
+      "sse"
     ])),
-    #("features", json.array([
-      json.string("multi_transport"),
-      json.string("transport_bridging"),
-      json.string("production_ready"),
-      json.string("comprehensive_testing")
+    #("features", json.array(of: json.string, from: [
+      "multi_transport",
+      "transport_bridging",
+      "production_ready",
+      "comprehensive_testing"
     ]))
   ])
   
@@ -265,7 +262,8 @@ pub fn backward_compatibility_test() {
   let legacy_versions = ["2024-11-05", "2024-10-07"]
   
   legacy_versions
-  |> should.have_length(2)
+  |> list.length
+  |> should.equal(2)
   
   // Current version should be newer
   mcp.protocol_version |> should.equal("2025-06-18")
@@ -284,7 +282,9 @@ pub fn production_readiness_test() {
     "comprehensive_testing"
   ]
   
-  production_features |> should.have_length(8)
+  production_features 
+  |> list.length 
+  |> should.equal(8)
   
   // All features should be implemented
   production_features
@@ -326,7 +326,7 @@ fn create_test_server() -> server.Server {
   let dummy_tool_handler = fn(_) {
     mcp.CallToolResult(content: [], is_error: Some(False), meta: None) |> Ok
   }
-  let dummy_decoder = decode.decode1(fn(x) { x }, decode.string)
+  let dummy_decoder = decode.string
   
   server.new("Test Integration Server", "1.0.0")
   |> server.add_prompt(prompt, dummy_prompt_handler)

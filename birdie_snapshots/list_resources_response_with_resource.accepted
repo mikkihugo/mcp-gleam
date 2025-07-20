@@ -1,5 +1,0 @@
----
-version: 1.2.7
-title: list resources response with resource
----
-{"resources":[{"uri":"file:///example.txt","name":"my resource"}]}

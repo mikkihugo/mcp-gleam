@@ -1,5 +1,0 @@
----
-version: 1.2.7
-title: read resource response
----
-{"contents":[{"mimeType":"image/png","uri":"file:///example.png","blob":"base64-encoded-data"},{"mimeType":"text/plain","uri":"file:///example.txt","text":"Resource content"}]}

@@ -357,7 +357,7 @@ fn handle_request(
       require_params(
         server,
         request,
-        read_resource,
+        read_resource_handler,
         mcp.read_resource_request_decoder(),
         mcp.read_resource_result_to_json,
       )
@@ -385,7 +385,7 @@ fn handle_request(
       require_params(
         server,
         request,
-        get_prompt,
+        get_prompt_handler,
         mcp.get_prompt_request_decoder(),
         mcp.get_prompt_result_to_json,
       )
@@ -404,7 +404,7 @@ fn handle_request(
       require_params(
         server,
         request,
-        call_tool,
+        call_tool_handler,
         mcp.call_tool_request_decoder(decode.dynamic),
         mcp.call_tool_result_to_json,
       )
@@ -517,10 +517,18 @@ pub fn list_resource_templates(
   ))
 }
 
-pub fn read_resource(
+fn read_resource_handler(
   server: Server,
   request: mcp.ReadResourceRequest,
 ) -> Result(mcp.ReadResourceResult, json.Json) {
+  read_resource(server, request)
+  |> result.map_error(fn(err) { json.object([#("error", json.string(err))]) })
+}
+
+pub fn read_resource(
+  server: Server,
+  request: mcp.ReadResourceRequest,
+) -> Result(mcp.ReadResourceResult, String) {
   case dict.get(server.resources, request.uri) {
     Ok(resource) -> {
       case resource.handler(request) {
@@ -529,9 +537,7 @@ pub fn read_resource(
       }
     }
     Error(_) -> {
-      Error(json.object([
-        #("error", json.string("Resource not found: " <> request.uri))
-      ]))
+      Error("Resource not found: " <> request.uri)
     }
   }
 }
@@ -546,10 +552,18 @@ pub fn list_prompts(
   Ok(mcp.ListPromptsResult(prompts:, next_cursor: None, meta: None))
 }
 
-pub fn get_prompt(
+fn get_prompt_handler(
   server: Server,
   request: mcp.GetPromptRequest,
 ) -> Result(mcp.GetPromptResult, json.Json) {
+  get_prompt(server, request)
+  |> result.map_error(fn(err) { json.object([#("error", json.string(err))]) })
+}
+
+pub fn get_prompt(
+  server: Server,
+  request: mcp.GetPromptRequest,
+) -> Result(mcp.GetPromptResult, String) {
   case dict.get(server.prompts, request.name) {
     Ok(prompt) -> {
       case prompt.handler(request) {
@@ -558,9 +572,7 @@ pub fn get_prompt(
       }
     }
     Error(_) -> {
-      Error(json.object([
-        #("error", json.string("Prompt not found: " <> request.name))
-      ]))
+      Error("Prompt not found: " <> request.name)
     }
   }
 }
@@ -575,10 +587,23 @@ pub fn list_tools(
   Ok(mcp.ListToolsResult(tools:, next_cursor: None, meta: None))
 }
 
-pub fn call_tool(
+fn call_tool_handler(
   server: Server,
   request: mcp.CallToolRequest(Dynamic),
 ) -> Result(mcp.CallToolResult, json.Json) {
+  call_tool(server, request)
+  |> result.map_error(fn(err) { 
+    case err {
+      mcp.ApplicationError(msg) -> json.object([#("error", json.string(msg))])
+      _ -> json.object([#("error", json.string("Tool error"))])
+    }
+  })
+}
+
+pub fn call_tool(
+  server: Server,
+  request: mcp.CallToolRequest(Dynamic),
+) -> Result(mcp.CallToolResult, mcp.McpError) {
   case dict.get(server.tools, request.name) {
     Ok(tool) -> {
       case tool.handler(request) {
@@ -587,9 +612,7 @@ pub fn call_tool(
       }
     }
     Error(_) -> {
-      Error(json.object([
-        #("error", json.string("Tool not found: " <> request.name))
-      ]))
+      Error(mcp.ApplicationError("Tool not found: " <> request.name))
     }
   }
 }

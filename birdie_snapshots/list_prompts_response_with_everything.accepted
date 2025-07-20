@@ -1,5 +1,0 @@
----
-version: 1.2.7
-title: list prompts response with everything
----
-{"nextCursor":"cursor","prompts":[{"description":"Asks the LLM to analyze code quality and suggest improvements","name":"code_review","arguments":[{"description":"The code to review","name":"code","required":true}]},{"name":"my prompt","arguments":[]}]}

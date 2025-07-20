@@ -12,17 +12,17 @@ import gleam/string
 import mcp_toolkit_gleam/core/protocol as mcp
 import mcp_toolkit_gleam/core/server
 import mcp_toolkit_gleam/transport/stdio
-import mcp_toolkit_gleam/transport_optional/websocket
-import mcp_toolkit_gleam/transport_optional/sse
-import mcp_toolkit_gleam/transport_optional/bidirectional
-import mcp_toolkit_gleam/transport_optional/bridge
+// import mcp_toolkit_gleam/transport_optional/websocket
+// import mcp_toolkit_gleam/transport_optional/sse
+// import mcp_toolkit_gleam/transport_optional/bidirectional
+// import mcp_toolkit_gleam/transport_optional/bridge
 
 pub fn main() {
   case argv.load().arguments {
     ["stdio"] -> run_stdio_only()
-    ["websocket"] -> run_websocket_server()
-    ["sse"] -> run_sse_server()
-    ["bridge"] -> run_bridge_example()
+    // ["websocket"] -> run_websocket_server()
+    // ["sse"] -> run_sse_server()
+    // ["bridge"] -> run_bridge_example()
     ["full"] -> run_full_server()
     _ -> {
       print_usage()
@@ -132,21 +132,21 @@ fn create_production_server() -> server.Server {
   |> server.build
 }
 
-fn add_all_prompts(srv: server.ServerBuilder) -> server.ServerBuilder {
+fn add_all_prompts(srv: server.Builder) -> server.Builder {
   srv
   |> server.add_prompt(code_review_prompt(), code_review_handler)
   |> server.add_prompt(documentation_prompt(), documentation_handler)
   |> server.add_prompt(testing_prompt(), testing_handler)
 }
 
-fn add_all_resources(srv: server.ServerBuilder) -> server.ServerBuilder {
+fn add_all_resources(srv: server.Builder) -> server.Builder {
   srv
   |> server.add_resource(project_structure_resource(), project_structure_handler)
   |> server.add_resource(api_docs_resource(), api_docs_handler)
   |> server.add_resource(changelog_resource(), changelog_handler)
 }
 
-fn add_all_tools(srv: server.ServerBuilder) -> server.ServerBuilder {
+fn add_all_tools(srv: server.Builder) -> server.Builder {
   srv
   |> server.add_tool(weather_tool(), weather_decoder(), weather_handler)
   |> server.add_tool(time_tool(), time_decoder(), time_handler)

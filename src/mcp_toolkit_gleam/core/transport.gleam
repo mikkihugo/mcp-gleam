@@ -1,9 +1,7 @@
 import gleam/erlang/process.{type Subject}
 import gleam/io
-import gleam/json.{type Json}
-import gleam/option.{type Option}
-import gleam/result
-import mcp_gleam/server/stdio
+import gleam/option.{type Option, None}
+import mcp_toolkit_gleam/transport/stdio
 
 /// Represents different transport mechanisms for MCP
 pub type Transport {
@@ -68,25 +66,7 @@ fn create_stdio_transport() -> Result(TransportInterface, String) {
   ))
 }
 
-/// Create WebSocket transport interface  
-fn create_websocket_transport(config: WebSocketTransport) -> Result(TransportInterface, String) {
-  Ok(TransportInterface(
-    send: websocket_send,
-    receive: websocket_receive,
-    start: fn() { websocket_start(config) },
-    stop: websocket_stop,
-  ))
-}
 
-/// Create SSE transport interface
-fn create_sse_transport(config: SSETransport) -> Result(TransportInterface, String) {
-  Ok(TransportInterface(
-    send: sse_send,
-    receive: sse_receive,
-    start: fn() { sse_start(config) },
-    stop: sse_stop,
-  ))
-}
 
 // Stdio transport implementations
 fn stdio_send(message: TransportMessage) -> Result(Nil, String) {
@@ -96,7 +76,7 @@ fn stdio_send(message: TransportMessage) -> Result(Nil, String) {
 }
 
 fn stdio_receive() -> Result(TransportEvent, String) {
-  case mcp_gleam/server/stdio.read_message() {
+  case stdio.read_message() {
     Ok(content) -> {
       let transport_msg = TransportMessage(content: content, id: None)
       Ok(MessageReceived(transport_msg))

@@ -1,5 +1,0 @@
----
-version: 1.2.7
-title: initialize request with roots
----
-{"protocolVersion":"2024-11-05","clientInfo":{"name":"client","version":"1.0.0"},"capabilities":{"roots":{"listChanged":false}}}
