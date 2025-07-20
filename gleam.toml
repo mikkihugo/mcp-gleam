@@ -3,7 +3,7 @@ version = "1.0.0"
 
 description = "Production-ready Model Context Protocol (MCP) Toolkit - comprehensive server implementation in Gleam"
 licences = ["Apache-2.0"]
-repository = { type = "github", user = "mikkihugo", repo = "mcp-gleam" }
+repository = { type = "github", user = "mikkihugo", repo = "mcp_toolkit_gleam" }
 
 # Core dependencies (required for all functionality)
 [dependencies]

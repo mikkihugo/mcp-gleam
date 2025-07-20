@@ -1,0 +1,7 @@
+---
+version: 1.2.7
+title: stdio_message_formats
+---
+{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{}}}
+{"jsonrpc":"2.0","id":1,"method":"prompts/list"}
+[{"jsonrpc":"2.0","id":1,"method":"ping"}]

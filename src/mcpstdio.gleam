@@ -2,12 +2,9 @@
 /// Production-ready MCP server with stdio transport (dependency-free)
 
 import gleam/dynamic/decode
-import gleam/erlang/process
 import gleam/io
 import gleam/json
 import gleam/option.{None, Some}
-import gleam/result
-import gleam/string
 import mcp_toolkit_gleam/core/protocol as mcp
 import mcp_toolkit_gleam/core/server
 import mcp_toolkit_gleam/transport/stdio

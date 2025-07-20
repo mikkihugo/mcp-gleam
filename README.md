@@ -212,8 +212,8 @@ export MCP_AUTH_ENABLED=false
 
 ### Development Setup
 ```bash
-git clone https://github.com/mikkihugo/mcp-gleam.git
-cd mcp-gleam
+git clone https://github.com/mikkihugo/mcp_toolkit_gleam.git
+cd mcp_toolkit_gleam
 gleam deps download
 gleam test
 ```
