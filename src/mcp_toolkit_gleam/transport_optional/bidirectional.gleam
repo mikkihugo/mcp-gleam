@@ -7,13 +7,14 @@ import gleam/otp/actor
 import gleam/result
 import gleam/string
 import mcp_toolkit_gleam/core/protocol as mcp
+import mcp_toolkit_gleam/core/server
 import mcp_toolkit_gleam/core/transport.{type Transport, type TransportEvent, type TransportMessage}
 import jsonrpc
 
 /// Bidirectional server state
 pub type BidirectionalServer {
   BidirectionalServer(
-    server: mcp_gleam/server.Server,
+    server: server.Server,
     transports: List(Transport),
     active_connections: Dict(String, ConnectionInfo),
     message_subject: Subject(ServerMessage),
@@ -51,7 +52,7 @@ pub type BidirectionalCapabilities {
 
 /// Create a new bidirectional server
 pub fn new_bidirectional_server(
-  server: mcp_gleam/server.Server,
+  server: server.Server,
   transports: List(Transport),
 ) -> Result(BidirectionalServer, String) {
   let message_subject = process.new_subject()
@@ -178,7 +179,7 @@ fn handle_incoming_message(
       case rpc_message {
         jsonrpc.Request(id, method, params) -> {
           // Handle client request using existing server
-          case mcp_gleam/server.handle_message(state.server, message.content) {
+          case server.handle_message(state.server, message.content) {
             Ok(Some(response)) -> {
               // Send response back through transport
               let transport_msg = TransportMessage(

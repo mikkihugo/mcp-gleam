@@ -47,8 +47,8 @@ pub fn start_sse_server(
   event_subject: Subject(TransportEvent),
 ) -> Result(Subject(TransportEvent), String) {
   let handler = fn(req: Request(Connection)) -> Response(ResponseData) {
-    case request.path_segments(req) {
-      segments if list.contains(segments, endpoint) -> {
+    case list.contains(request.path_segments(req), endpoint) {
+      True -> {
         case request.get_method(req) {
           http.Get -> handle_sse_connection(req, event_subject)
           http.Post -> handle_sse_message(req, event_subject)
@@ -59,7 +59,7 @@ pub fn start_sse_server(
           }
         }
       }
-      _ -> {
+      False -> {
         response.new(404)
         |> response.set_body(mist.Bytes(bytes_tree.new()))
       }

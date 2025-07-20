@@ -1,5 +1,5 @@
 import gleam/json
-import mcp_gleam/json_schema
+import mcp_toolkit_gleam/core/json_schema
 import simplifile
 
 pub fn main() {

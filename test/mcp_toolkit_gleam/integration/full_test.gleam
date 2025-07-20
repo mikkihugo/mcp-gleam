@@ -10,6 +10,10 @@ import gleeunit/should
 import mcp_toolkit_gleam/core/protocol as mcp
 import mcp_toolkit_gleam/core/server
 
+pub type SearchInput {
+  SearchInput(query: String, limit: option.Option(Int))
+}
+
 pub fn main() {
   gleeunit.main()
 }
@@ -123,10 +127,6 @@ pub fn tool_flow_integration_test() {
       priority: Some(1.0),
     )),
   )
-  
-  pub type SearchInput {
-    SearchInput(query: String, limit: option.Option(Int))
-  }
   
   let decoder = decode.decode2(
     SearchInput,

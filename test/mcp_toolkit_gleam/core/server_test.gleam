@@ -8,6 +8,10 @@ import gleeunit/should
 import mcp_toolkit_gleam/core/server
 import mcp_toolkit_gleam/core/protocol as mcp
 
+pub type TestInput {
+  TestInput(value: String)
+}
+
 pub fn main() {
   gleeunit.main()
 }
@@ -81,10 +85,6 @@ pub fn add_tool_test() {
     description: Some("Test tool"),
     annotations: None,
   )
-  
-  pub type TestInput {
-    TestInput(value: String)
-  }
   
   let decoder = decode.decode1(TestInput, decode.field("value", decode.string))
   

@@ -248,9 +248,9 @@ fn forward_message(
       }
       
       // Determine target transport
-      let target_transport_id = case source {
-        s if string.starts_with(s, "source_") -> "target_" <> bridge_info.bridge.id
-        _ -> "source_" <> bridge_info.bridge.id
+      let target_transport_id = case string.starts_with(source, "source_") {
+        True -> "target_" <> bridge_info.bridge.id
+        False -> "source_" <> bridge_info.bridge.id
       }
       
       // Send message to target transport
