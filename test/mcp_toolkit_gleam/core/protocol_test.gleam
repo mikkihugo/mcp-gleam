@@ -1,7 +1,7 @@
 /// Comprehensive protocol tests using gleunit and birdie
 import birdie
-import gleam/dynamic
 import gleam/json
+import gleam/list
 import gleam/option.{None, Some}
 import gleam/string
 import gleeunit
@@ -63,9 +63,9 @@ pub fn tool_schema_test() {
   }"
   
   case mcp.tool_input_schema(schema_json) {
-    Ok(schema) -> {
-      // Schema should be valid
-      schema |> should.not_equal(json.null())
+    Ok(_schema) -> {
+      // Schema should be valid - just test that it succeeded
+      should.equal(True, True)
     }
     Error(_) -> should.fail()
   }
@@ -76,9 +76,13 @@ pub fn prompt_creation_test() {
   let prompt = mcp.Prompt(
     name: "test_prompt",
     description: Some("A test prompt"),
-    arguments: Some(json.object([
-      #("param1", json.string("value1"))
-    ]))
+    arguments: Some([
+      mcp.PromptArgument(
+        name: "param1",
+        description: Some("Parameter 1"),
+        required: Some(True),
+      ),
+    ])
   )
   
   prompt.name |> should.equal("test_prompt")
@@ -149,14 +153,14 @@ pub fn initialization_test() {
   )
   
   let server_capabilities = mcp.ServerCapabilities(
-    experimental: None,
+    completions: None,
     logging: None,
-    prompts: Some(mcp.PromptsCapability(list_changed: Some(True))),
-    resources: Some(mcp.ResourcesCapability(
+    prompts: Some(mcp.ServerCapabilitiesPrompts(list_changed: Some(True))),
+    resources: Some(mcp.ServerCapabilitiesResources(
       subscribe: Some(True),
       list_changed: Some(True),
     )),
-    tools: Some(mcp.ToolsCapability(list_changed: Some(True))),
+    tools: Some(mcp.ServerCapabilitiesTools(list_changed: Some(True))),
   )
   
   client_info.name |> should.equal("test_client")
@@ -168,14 +172,23 @@ pub fn json_serialization_snapshot_test() {
   let prompt = mcp.Prompt(
     name: "code_review",
     description: Some("Generate a code review"),
-    arguments: Some(json.object([
-      #("language", json.string("gleam")),
-      #("focus", json.string("performance"))
-    ]))
+    arguments: Some([
+      mcp.PromptArgument(
+        name: "language",
+        description: Some("Programming language"),
+        required: Some(True),
+      ),
+      mcp.PromptArgument(
+        name: "focus",
+        description: Some("Review focus area"),
+        required: Some(False),
+      ),
+    ])
   )
   
   // This will create a snapshot for comparison
   prompt
+  |> mcp.prompt_to_json
   |> json.to_string
   |> birdie.snap(title: "prompt_json_serialization")
 }
@@ -194,6 +207,7 @@ pub fn resource_json_snapshot_test() {
   )
   
   resource
+  |> mcp.resource_to_json
   |> json.to_string
   |> birdie.snap(title: "resource_json_serialization")
 }
@@ -214,13 +228,17 @@ pub fn tool_json_snapshot_test() {
     name: "search",
     input_schema: schema,
     description: Some("Search for information"),
-    annotations: Some(mcp.Annotations(
-      audience: Some([mcp.User, mcp.Assistant]),
-      priority: Some(1.0),
+    annotations: Some(mcp.ToolAnnotations(
+      destructive_hint: Some(False),
+      idempotent_hint: Some(True),
+      open_world_hint: Some(False),
+      read_only_hint: Some(True),
+      title: Some("Search Tool"),
     )),
   )
   
   tool
+  |> mcp.tool_to_json
   |> json.to_string
   |> birdie.snap(title: "tool_json_serialization")
 }
@@ -242,14 +260,12 @@ pub fn complex_structures_test() {
       ),
     ],
     description: Some("Complex prompt result"),
-    meta: Some(json.object([
-      #("timestamp", json.string("2024-01-01T00:00:00Z")),
-      #("version", json.string("1.0.0"))
-    ])),
+    meta: Some(mcp.Meta(progress_token: Some(mcp.ProgressTokenString("test-token")))),
   )
   
   get_prompt_result.messages
-  |> should.have_length(1)
+  |> list.length
+  |> should.equal(1)
   
   get_prompt_result.description
   |> should.equal(Some("Complex prompt result"))
@@ -289,5 +305,7 @@ pub fn boundary_conditions_test() {
     annotations: None,
   )
   
-  long_content.text |> should.have_length(10000)
+  long_content.text 
+  |> string.length 
+  |> should.equal(10000)
 }

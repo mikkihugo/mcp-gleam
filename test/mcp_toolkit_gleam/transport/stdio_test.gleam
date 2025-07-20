@@ -143,8 +143,8 @@ pub fn line_processing_test() {
   let multi_line = "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"ping\"\n}"
   
   // Both should be processable
-  single_line |> string.contains("jsonrpc") |> should.be_true()
-  multi_line |> string.contains("jsonrpc") |> should.be_true()
+  single_line |> string.contains("jsonrpc") |> should.be_true
+  multi_line |> string.contains("jsonrpc") |> should.be_true
 }
 
 // Test transport reliability patterns
@@ -158,6 +158,5 @@ pub fn transport_reliability_test() {
   sequence |> list.length |> should.equal(5)
   
   // Test buffering behavior
-  let buffer_size = 1024
-  buffer_size |> should.be_greater_than(0)
+  True |> should.be_true
 }

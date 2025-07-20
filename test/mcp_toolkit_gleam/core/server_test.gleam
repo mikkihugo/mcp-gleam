@@ -86,7 +86,10 @@ pub fn add_tool_test() {
     annotations: None,
   )
   
-  let decoder = decode.decode1(TestInput, decode.field("value", decode.string))
+  let decoder: decode.Decoder(TestInput) = {
+    use value <- decode.field("value", decode.string)
+    decode.success(TestInput(value))
+  }
   
   let handler = fn(_) {
     mcp.CallToolResult(
@@ -127,7 +130,7 @@ pub fn server_builder_chain_test() {
   let dummy_tool_handler = fn(_) { 
     mcp.CallToolResult(content: [], is_error: Some(False), meta: None) |> Ok 
   }
-  let dummy_decoder = decode.decode1(fn(x) { x }, decode.string)
+  let dummy_decoder = decode.string
   
   let srv = server.new("Chain Test", "1.0.0")
     |> server.add_prompt(prompt, dummy_prompt_handler)
@@ -154,9 +157,13 @@ pub fn server_capabilities_snapshot_test() {
   let prompt = mcp.Prompt(
     name: "snapshot_prompt",
     description: Some("Prompt for snapshot testing"),
-    arguments: Some(json.object([
-      #("param", json.string("value"))
-    ]))
+    arguments: Some([
+      mcp.PromptArgument(
+        name: "param",
+        description: Some("A parameter"),
+        required: Some(True),
+      ),
+    ])
   )
   
   let resource = mcp.Resource(
@@ -188,7 +195,7 @@ pub fn server_capabilities_snapshot_test() {
     fn(_) { mcp.CallToolResult(content: [], is_error: Some(False), meta: None) |> Ok }
   )
   
-  let dummy_decoder = decode.decode1(fn(x) { x }, decode.string)
+  let dummy_decoder = decode.string
   
   // Build server with all capabilities
   let srv = server.new("Snapshot Server", "1.0.0")
@@ -261,7 +268,7 @@ pub fn multiple_tools_test() {
   let handler = fn(_) {
     mcp.CallToolResult(content: [], is_error: Some(False), meta: None) |> Ok
   }
-  let decoder = decode.decode1(fn(x) { x }, decode.string)
+  let decoder = decode.string
   
   let srv = server.new("Multi Tool", "1.0.0")
     |> server.add_tool(tool1, decoder, handler)
