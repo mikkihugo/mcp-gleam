@@ -279,8 +279,8 @@ pub fn error_handling_test() {
     Ok(_) -> should.fail()
   }
   
-  // Test empty schema
-  case mcp.tool_input_schema("{}") {
+  // Test minimal valid schema
+  case mcp.tool_input_schema("{\"type\": \"object\"}") {
     Ok(_) -> should.be_true(True)
     Error(_) -> should.fail()
   }

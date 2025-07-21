@@ -1,0 +1,5 @@
+---
+version: 1.2.7
+title: tool_json_serialization
+---
+{"description":"Search for information","annotations":{"title":"Search Tool","readOnlyHint":true,"openWorldHint":false,"idempotentHint":true,"destructiveHint":false},"inputSchema":{"type":"object","properties":{"query":{"description":"Search query","type":"string"}},"required":["query"],"additionalProperties":{}},"name":"search"}

@@ -1,0 +1,5 @@
+---
+version: 1.2.7
+title: complete_integration_config
+---
+{"name":"MCP Toolkit Integration Test","version":"1.0.0","protocol_version":"2025-06-18","capabilities":{"prompts":true,"resources":true,"tools":true,"bidirectional":true},"transports":["stdio","websocket","sse"],"features":["multi_transport","transport_bridging","production_ready","comprehensive_testing"]}
