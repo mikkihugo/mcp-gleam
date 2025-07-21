@@ -3,12 +3,9 @@
 
 import argv
 import gleam/dynamic/decode
-import gleam/erlang/process
 import gleam/io
 import gleam/json
 import gleam/option.{None, Some}
-import gleam/result
-import gleam/string
 import mcp_toolkit_gleam/core/protocol as mcp
 import mcp_toolkit_gleam/core/server
 import mcp_toolkit_gleam/transport/stdio
@@ -23,7 +20,7 @@ pub fn main() {
     // ["websocket"] -> run_websocket_server()
     // ["sse"] -> run_sse_server()
     // ["bridge"] -> run_bridge_example()
-    ["full"] -> run_full_server()
+    // ["full"] -> run_full_server()
     _ -> {
       print_usage()
     }
@@ -37,17 +34,18 @@ fn print_usage() {
   io.println("")
   io.println("Transports:")
   io.println("  stdio     - stdio transport only (dependency-free)")
-  io.println("  websocket - WebSocket server on ws://localhost:8080/mcp")
-  io.println("  sse       - Server-Sent Events on http://localhost:8081/mcp")
-  io.println("  bridge    - Transport bridging example")
-  io.println("  full      - All transports with bidirectional communication")
+  // io.println("  websocket - WebSocket server on ws://localhost:8080/mcp")
+  // io.println("  sse       - Server-Sent Events on http://localhost:8081/mcp")
+  // io.println("  bridge    - Transport bridging example")
+  // io.println("  full      - All transports with bidirectional communication")
   io.println("")
   io.println("Examples:")
   io.println("  gleam run -- mcpserver stdio")
-  io.println("  gleam run -- mcpserver websocket")
-  io.println("  gleam run -- mcpserver full")
+  // io.println("  gleam run -- mcpserver websocket")
+  // io.println("  gleam run -- mcpserver full")
   io.println("")
-  io.println("Note: WebSocket and SSE require the 'mist' dependency.")
+  io.println("Note: WebSocket and SSE transports are currently disabled.")
+  io.println("To enable them, uncomment mist dependency in gleam.toml")
 }
 
 fn run_stdio_only() {
@@ -56,59 +54,7 @@ fn run_stdio_only() {
   run_stdio_loop(server)
 }
 
-fn run_websocket_server() {
-  io.println("Starting MCP Toolkit WebSocket server...")
-  io.println("Listening on ws://localhost:8080/mcp")
-  let server = create_production_server()
-  websocket.start_server(server, 8080)
-}
 
-fn run_sse_server() {
-  io.println("Starting MCP Toolkit SSE server...")
-  io.println("Listening on http://localhost:8081/mcp")
-  let server = create_production_server()
-  sse.start_server(server, 8081)
-}
-
-fn run_bridge_example() {
-  io.println("Starting MCP Toolkit transport bridge example...")
-  io.println("Bridging stdio ↔ WebSocket")
-  
-  let server = create_production_server()
-  let bridge_config = bridge.BridgeConfig(
-    filter_requests: True,
-    filter_notifications: True,
-    transform_messages: False,
-  )
-  
-  bridge.start_bridge(
-    stdio.create_transport(),
-    websocket.create_transport(8080),
-    bridge_config
-  )
-}
-
-fn run_full_server() {
-  io.println("Starting MCP Toolkit full server...")
-  io.println("Available transports:")
-  io.println("  - stdio (JSON-RPC on stdin/stdout)")
-  io.println("  - WebSocket on ws://localhost:8080/mcp")
-  io.println("  - SSE on http://localhost:8081/mcp")
-  io.println("  - Bidirectional communication enabled")
-  
-  let server = create_production_server()
-  
-  // Start bidirectional communication manager
-  let bidirectional_mgr = bidirectional.start_manager(server)
-  
-  // Start all transports
-  process.start(fn() { websocket.start_server(server, 8080) }, False)
-  process.start(fn() { sse.start_server(server, 8081) }, False)
-  
-  // Keep stdio as main thread
-  io.println("Main thread running stdio transport...")
-  run_stdio_loop(server)
-}
 
 fn run_stdio_loop(server: server.Server) -> Nil {
   case stdio.read_message() {
@@ -158,10 +104,18 @@ fn code_review_prompt() {
   mcp.Prompt(
     name: "code_review",
     description: Some("Generate comprehensive code reviews with best practices"),
-    arguments: Some(json.object([
-      #("language", json.string("The programming language")),
-      #("focus", json.string("Areas to focus on (security, performance, maintainability)"))
-    ]))
+    arguments: Some([
+      mcp.PromptArgument(
+        name: "language",
+        description: Some("The programming language"),
+        required: Some(True)
+      ),
+      mcp.PromptArgument(
+        name: "focus", 
+        description: Some("Areas to focus on (security, performance, maintainability)"),
+        required: Some(False)
+      )
+    ])
   )
 }
 
@@ -187,9 +141,13 @@ fn documentation_prompt() {
   mcp.Prompt(
     name: "documentation",
     description: Some("Generate technical documentation"),
-    arguments: Some(json.object([
-      #("type", json.string("Type of documentation (API, user guide, technical spec)"))
-    ]))
+    arguments: Some([
+      mcp.PromptArgument(
+        name: "type",
+        description: Some("Type of documentation (API, user guide, technical spec)"),
+        required: Some(True)
+      )
+    ])
   )
 }
 
@@ -365,7 +323,7 @@ pub type TimeRequest {
 }
 
 fn time_decoder() -> decode.Decoder(TimeRequest) {
-  use timezone <- decode.optional_field("timezone", decode.string)
+  use timezone <- mcp.omittable_field("timezone", decode.string)
   decode.success(TimeRequest(timezone:))
 }
 
