@@ -35,10 +35,14 @@ pub fn tool_methods_test() {
 
 // Test notification methods
 pub fn notification_methods_test() {
-  method.notification_resources_list_changed |> should.equal("notifications/resources/list_changed")
-  method.notification_resource_updated |> should.equal("notifications/resources/updated")
-  method.notification_prompts_list_changed |> should.equal("notifications/prompts/list_changed")
-  method.notification_tools_list_changed |> should.equal("notifications/tools/list_changed")
+  method.notification_resources_list_changed
+  |> should.equal("notifications/resources/list_changed")
+  method.notification_resource_updated
+  |> should.equal("notifications/resources/updated")
+  method.notification_prompts_list_changed
+  |> should.equal("notifications/prompts/list_changed")
+  method.notification_tools_list_changed
+  |> should.equal("notifications/tools/list_changed")
   method.notification_cancelled |> should.equal("notifications/cancelled")
 }
 
@@ -50,21 +54,24 @@ pub fn completion_methods_test() {
 // Test method constants are strings
 pub fn method_constants_are_strings_test() {
   // Test method constants are all defined
-  should.equal(list.length([
-    method.initialize,
-    method.ping,
-    method.resources_list,
-    method.resources_templates_list,
-    method.resources_read,
-    method.prompts_list,
-    method.prompts_get,
-    method.tools_list,
-    method.tools_call,
-    method.notification_resources_list_changed,
-    method.notification_resource_updated,
-    method.notification_prompts_list_changed,
-    method.notification_tools_list_changed,
-    method.notification_cancelled,
-    method.completion_complete,
-  ]), 15)
+  should.equal(
+    list.length([
+      method.initialize,
+      method.ping,
+      method.resources_list,
+      method.resources_templates_list,
+      method.resources_read,
+      method.prompts_list,
+      method.prompts_get,
+      method.tools_list,
+      method.tools_call,
+      method.notification_resources_list_changed,
+      method.notification_resource_updated,
+      method.notification_prompts_list_changed,
+      method.notification_tools_list_changed,
+      method.notification_cancelled,
+      method.completion_complete,
+    ]),
+    15,
+  )
 }

@@ -3,8 +3,8 @@ import gleam/dynamic/decode.{type Decoder, type Dynamic}
 import gleam/json
 import gleam/list
 import gleam/result
-import mcp_toolkit_gleam/core/method
 import jsonrpc
+import mcp_toolkit_gleam/core/method
 
 import gleam/option.{type Option, None, Some}
 
@@ -592,7 +592,7 @@ fn call_tool_handler(
   request: mcp.CallToolRequest(Dynamic),
 ) -> Result(mcp.CallToolResult, json.Json) {
   call_tool(server, request)
-  |> result.map_error(fn(err) { 
+  |> result.map_error(fn(err) {
     case err {
       mcp.ApplicationError(msg) -> json.object([#("error", json.string(msg))])
       _ -> json.object([#("error", json.string("Tool error"))])

@@ -20,8 +20,8 @@ jobs:
       - name: Set up BEAM Environment
         uses: erlef/setup-beam@v1
         with:
-          otp-version: "28"
-          gleam-version: "1"
+          otp-version: "27"
+          gleam-version: "1.11.1"
           rebar3-version: "3"
 
       - name: Download Dependencies
