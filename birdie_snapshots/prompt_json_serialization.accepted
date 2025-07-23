@@ -1,0 +1,5 @@
+---
+version: 1.2.7
+title: prompt_json_serialization
+---
+{"description":"Generate a code review","arguments":[{"required":true,"description":"Programming language","name":"language"},{"required":false,"description":"Review focus area","name":"focus"}],"name":"code_review"}

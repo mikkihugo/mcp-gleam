@@ -1,0 +1,5 @@
+---
+version: 1.2.7
+title: resource_json_serialization
+---
+{"size":1024,"mimeType":"text/markdown","description":"Project documentation","annotations":{"priority":0.8,"audience":["user"]},"name":"project_docs","uri":"file:///docs/README.md"}

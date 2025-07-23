@@ -1,6 +1,5 @@
 /// MCP Toolkit Gleam - Stdio Transport Only
 /// Production-ready MCP server with stdio transport (dependency-free)
-
 import gleam/dynamic/decode
 import gleam/io
 import gleam/json
@@ -13,7 +12,7 @@ pub fn main() {
   io.println("MCP Toolkit Gleam - Stdio Transport")
   io.println("Production-ready MCP server with stdio transport")
   io.println("Listening for JSON-RPC messages on stdin...")
-  
+
   let server = create_example_server()
   run_stdio_loop(server)
 }
@@ -36,15 +35,19 @@ fn create_example_server() -> server.Server {
   server.new("MCP Toolkit Gleam", "1.0.0")
   |> server.add_prompt(example_prompt(), example_prompt_handler)
   |> server.add_resource(example_resource(), example_resource_handler)
-  |> server.add_tool(example_tool(), get_weather_decoder(), example_tool_handler)
+  |> server.add_tool(
+    example_tool(),
+    get_weather_decoder(),
+    example_tool_handler,
+  )
   |> server.build
 }
 
 fn example_prompt() {
   mcp.Prompt(
-    name: "code_review", 
+    name: "code_review",
     description: Some("Generate a comprehensive code review"),
-    arguments: None
+    arguments: None,
   )
 }
 

@@ -1,6 +1,5 @@
 /// MCP Toolkit Gleam - Full Server with All Transports
 /// Production-ready MCP server with WebSocket, SSE, and stdio transports
-
 import argv
 import gleam/dynamic/decode
 import gleam/io
@@ -9,6 +8,7 @@ import gleam/option.{None, Some}
 import mcp_toolkit_gleam/core/protocol as mcp
 import mcp_toolkit_gleam/core/server
 import mcp_toolkit_gleam/transport/stdio
+
 // import mcp_toolkit_gleam/transport_optional/websocket
 // import mcp_toolkit_gleam/transport_optional/sse
 // import mcp_toolkit_gleam/transport_optional/bidirectional
@@ -54,8 +54,6 @@ fn run_stdio_only() {
   run_stdio_loop(server)
 }
 
-
-
 fn run_stdio_loop(server: server.Server) -> Nil {
   case stdio.read_message() {
     Ok(msg) -> {
@@ -87,7 +85,10 @@ fn add_all_prompts(srv: server.Builder) -> server.Builder {
 
 fn add_all_resources(srv: server.Builder) -> server.Builder {
   srv
-  |> server.add_resource(project_structure_resource(), project_structure_handler)
+  |> server.add_resource(
+    project_structure_resource(),
+    project_structure_handler,
+  )
   |> server.add_resource(api_docs_resource(), api_docs_handler)
   |> server.add_resource(changelog_resource(), changelog_handler)
 }
@@ -108,14 +109,16 @@ fn code_review_prompt() {
       mcp.PromptArgument(
         name: "language",
         description: Some("The programming language"),
-        required: Some(True)
+        required: Some(True),
       ),
       mcp.PromptArgument(
-        name: "focus", 
-        description: Some("Areas to focus on (security, performance, maintainability)"),
-        required: Some(False)
-      )
-    ])
+        name: "focus",
+        description: Some(
+          "Areas to focus on (security, performance, maintainability)",
+        ),
+        required: Some(False),
+      ),
+    ]),
   )
 }
 
@@ -144,10 +147,12 @@ fn documentation_prompt() {
     arguments: Some([
       mcp.PromptArgument(
         name: "type",
-        description: Some("Type of documentation (API, user guide, technical spec)"),
-        required: Some(True)
-      )
-    ])
+        description: Some(
+          "Type of documentation (API, user guide, technical spec)",
+        ),
+        required: Some(True),
+      ),
+    ]),
   )
 }
 
@@ -173,7 +178,7 @@ fn testing_prompt() {
   mcp.Prompt(
     name: "testing",
     description: Some("Generate test cases and testing strategies"),
-    arguments: None
+    arguments: None,
   )
 }
 

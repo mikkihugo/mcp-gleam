@@ -49,7 +49,9 @@ pub type TransportInterface {
 }
 
 /// Create a transport interface for the given transport type
-pub fn create_transport(transport: Transport) -> Result(TransportInterface, String) {
+pub fn create_transport(
+  transport: Transport,
+) -> Result(TransportInterface, String) {
   case transport {
     Stdio(_) -> create_stdio_transport()
     // WebSocket and SSE transports are not available in stdio-only build
@@ -65,8 +67,6 @@ fn create_stdio_transport() -> Result(TransportInterface, String) {
     stop: stdio_stop,
   ))
 }
-
-
 
 // Stdio transport implementations
 fn stdio_send(message: TransportMessage) -> Result(Nil, String) {

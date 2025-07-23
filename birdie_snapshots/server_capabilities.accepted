@@ -1,0 +1,5 @@
+---
+version: 1.2.7
+title: server_capabilities
+---
+{"name":"Snapshot Server","version":"1.0.0","has_prompts":true,"has_resources":true,"has_tools":true}

@@ -2,8 +2,8 @@
 /// 
 /// This module provides the main exports for the MCP Toolkit Gleam library.
 /// For detailed usage examples, see the README.md file.
-
-import mcp_toolkit_gleam/core/server  
+import mcp_toolkit_gleam/core/server
 
 // Re-export commonly used types for convenience
-pub type Server = server.Server
+pub type Server =
+  server.Server

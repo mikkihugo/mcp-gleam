@@ -4,8 +4,8 @@ import gleam/dynamic/decode.{type Decoder}
 import gleam/function
 import gleam/json.{type Json}
 import gleam/option.{type Option}
-import mcp_toolkit_gleam/core/json_schema
 import jsonrpc
+import mcp_toolkit_gleam/core/json_schema
 
 // 2025-06-18 (Latest MCP Specification)
 pub const protocol_version = "2025-06-18"
