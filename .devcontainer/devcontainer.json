@@ -1,24 +1,51 @@
 {
-  "name": "Gleam Development Environment",
-  "image": "erlang:27",
+  "name": "Gleam Development Environment with Enhanced Copilot Support",
+  "image": "erlang:28",
 
   "customizations": {
     "vscode": {
       "settings": {
         "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": true,
+          "source.organizeImports": true
+        },
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
         "[gleam]": {
-          "editor.defaultFormatter": "gleam.gleam"
+          "editor.defaultFormatter": "gleam.gleam",
+          "editor.tabSize": 2,
+          "editor.insertSpaces": true
+        },
+        "github.copilot.enable": true,
+        "github.copilot.editor.enableAutoCompletions": true,
+        "github.copilot.advanced": {
+          "debug.overrideEngine": "codex",
+          "debug.testOverrideProxyUrl": "",
+          "debug.overrideProxyUrl": ""
         }
       },
       "extensions": [
         "gleam.gleam",
         "github.copilot",
-        "github.copilot-chat"
+        "github.copilot-chat",
+        "ms-vscode.vscode-json",
+        "ms-vscode.hexeditor",
+        "redhat.vscode-yaml"
       ]
     }
   },
 
-  "postCreateCommand": "apt-get update && apt-get install -y curl jq && curl -L -o gleam.tar.gz \"https://github.com/gleam-lang/gleam/releases/download/v1.11.1/gleam-v1.11.1-x86_64-unknown-linux-musl.tar.gz\" && tar -xzf gleam.tar.gz -C /usr/local/bin && rm gleam.tar.gz && gleam deps download",
+  "postCreateCommand": "apt-get update && apt-get install -y curl jq git && curl -L -o gleam.tar.gz \"https://github.com/gleam-lang/gleam/releases/download/v1.11.1/gleam-v1.11.1-x86_64-unknown-linux-musl.tar.gz\" && tar -xzf gleam.tar.gz -C /usr/local/bin && rm gleam.tar.gz && gleam deps download",
 
-  "forwardPorts": [4000]
+  "forwardPorts": [4000, 8080, 8081],
+  
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  "mounts": [
+    "source=${localWorkspaceFolder}/.copilot,target=/workspace/.copilot,type=bind,consistency=cached"
+  ]
 }

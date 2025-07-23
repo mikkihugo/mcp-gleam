@@ -1,7 +1,7 @@
-# .github/workflows/test.yml
-# This workflow uses separate jobs for setting up the environment and running tests.
+# Automated Testing Pipeline
+# Comprehensive test suite with dependency caching for optimal performance
 
-name: test
+name: Automated Testing
 
 # Controls when the workflow will run
 on:
@@ -10,29 +10,33 @@ on:
       - master
       - main
   pull_request:
+    branches:
+      - master
+      - main
 
 jobs:
-  # This job sets up the environment and caches dependencies
-  setup:
+  # Environment setup and dependency caching job
+  setup-environment:
+    name: Setup Environment and Cache Dependencies
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Checkout Source Code
         uses: actions/checkout@v4
 
       - name: Set up BEAM tools
         uses: erlef/setup-beam@v1
         with:
-          otp-version: "27"
+          otp-version: "28"
           gleam-version: "1.11.1"
           rebar3-version: "3"
 
       # Generate a key for the cache based on the lock file
-      - name: Cache key
+      - name: Generate Dependency Cache Key
         id: cache-key
         run: echo "key=gleam-deps-${{ hashFiles('gleam.lock') }}" >> $GITHUB_OUTPUT
 
       # Cache the downloaded dependencies to speed up subsequent runs
-      - name: Cache dependencies
+      - name: Cache Project Dependencies
         uses: actions/cache@v4
         with:
           path: build/packages
@@ -40,34 +44,35 @@ jobs:
           restore-keys: |
             gleam-deps-
 
-      - name: Download dependencies
+      - name: Download Project Dependencies
         # Only run 'gleam deps download' if the cache was not restored
         if: steps.cache.outputs.cache-hit != 'true'
         run: gleam deps download
 
-  # This job runs the tests and formatting checks
-  test:
-    # This job depends on the 'setup' job completing successfully
-    needs: setup
+  # Comprehensive testing and code quality checks
+  run-tests:
+    name: Execute Tests and Quality Checks
+    # This job depends on the 'setup-environment' job completing successfully
+    needs: setup-environment
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Checkout Source Code
         uses: actions/checkout@v4
 
       - name: Set up BEAM tools
         uses: erlef/setup-beam@v1
         with:
-          otp-version: "27"
+          otp-version: "28"
           gleam-version: "1.11.1"
           rebar3-version: "3"
 
       # Generate the same cache key to find the correct cache
-      - name: Cache key
+      - name: Generate Dependency Cache Key
         id: cache-key
         run: echo "key=gleam-deps-${{ hashFiles('gleam.lock') }}" >> $GITHUB_OUTPUT
 
       # Restore the cached dependencies from the setup job
-      - name: Restore cached dependencies
+      - name: Restore Cached Dependencies
         uses: actions/cache@v4
         with:
           path: build/packages
@@ -75,8 +80,8 @@ jobs:
           restore-keys: |
             gleam-deps-
 
-      - name: Run tests
+      - name: Execute Comprehensive Test Suite
         run: gleam test
 
-      - name: Check formatting
+      - name: Validate Code Formatting Standards
         run: gleam format --check src test

@@ -1,17 +1,18 @@
-# .github/workflows/update-deps.yml
-# A workflow to manually update Gleam dependencies and create a pull request.
+# Dependency Update Automation
+# Automatically checks for and updates Gleam dependencies
 
-name: Manual Dependency Update
+name: Dependency Updates
 
-# This allows the workflow to be triggered manually from the Actions tab.
+# Manual trigger from GitHub Actions UI
 on:
   workflow_dispatch:
 
 jobs:
-  update-dependencies:
+  update-gleam-dependencies:
+    name: Update Gleam Dependencies
     runs-on: ubuntu-latest
     
-    # Required permissions for creating a pull request
+    # Required permissions for creating pull requests
     permissions:
       contents: write
       pull-requests: write
@@ -23,7 +24,7 @@ jobs:
       - name: Set up BEAM Environment
         uses: erlef/setup-beam@v1
         with:
-          otp-version: "27"
+          otp-version: "28"
           gleam-version: "1.11.1"
           rebar3-version: "3"
 

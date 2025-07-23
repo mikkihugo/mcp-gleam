@@ -1,13 +1,15 @@
-# Continuous Deployment: Publishes the package to Hex.pm.
-# This workflow is triggered MANUALLY when a new release is created in the GitHub UI.
-name: Release
+# Package Release Pipeline
+# Automated publishing to Hex.pm when releases are created
+
+name: Package Release
 
 on:
   release:
     types: [published]
 
 jobs:
-  publish:
+  publish-package:
+    name: Publish Package to Hex.pm
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -18,7 +20,7 @@ jobs:
       - name: Set up BEAM Environment
         uses: erlef/setup-beam@v1
         with:
-          otp-version: "27"
+          otp-version: "28"
           gleam-version: "1.11.1"
           rebar3-version: "3"
 
