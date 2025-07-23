@@ -26,6 +26,12 @@ Production-ready Model Context Protocol (MCP) Toolkit implementation in Gleam wi
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+- **Erlang/OTP 28+**: For optimal performance and compatibility
+- **Gleam 1.11.1+**: Latest Gleam compiler with modern language features
+- **Git**: For version control and dependency management
+
 ### Installation
 
 ```bash
@@ -36,28 +42,28 @@ gleam build
 ### Usage Examples
 
 ```bash
-# Stdio transport
-gleam run -- mcpstdio
+# Lightweight stdio transport (dependency-free)
+gleam run -m mcp_stdio_server
 
-# WebSocket server
-gleam run -- mcpserver websocket
+# Full server with WebSocket support
+gleam run -m mcp_full_server websocket
 
-# Server-Sent Events
-gleam run -- mcpserver sse
+# Full server with Server-Sent Events
+gleam run -m mcp_full_server sse
 
-# Transport bridging
-gleam run -- mcpserver bridge
+# Transport bridging between different protocols
+gleam run -m mcp_full_server bridge
 
-# Full server with all transports
-gleam run -- mcpserver full
+# Comprehensive server with all transports
+gleam run -m mcp_full_server full
 ```
 
 ## 📁 Project Structure
 
 ```
 src/
-├── mcpstdio.gleam              # Stdio executable
-├── mcpserver.gleam             # Full server executable  
+├── mcp_stdio_server.gleam        # Lightweight stdio executable
+├── mcp_full_server.gleam         # Comprehensive server executable  
 └── mcp_toolkit_gleam/
     ├── core/                   # Core protocol implementation
     │   ├── protocol.gleam      # MCP protocol types and functions

@@ -13,11 +13,11 @@ pub fn main() {
   io.println("Production-ready MCP server with stdio transport")
   io.println("Listening for JSON-RPC messages on stdin...")
 
-  let server = create_example_server()
-  run_stdio_loop(server)
+  let server = create_production_stdio_server()
+  execute_stdio_message_loop(server)
 }
 
-fn run_stdio_loop(server: server.Server) -> Nil {
+fn execute_stdio_message_loop(server: server.Server) -> Nil {
   case stdio.read_message() {
     Ok(msg) -> {
       case server.handle_message(server, msg) {
@@ -27,23 +27,26 @@ fn run_stdio_loop(server: server.Server) -> Nil {
     }
     Error(_) -> Nil
   }
-  run_stdio_loop(server)
+  execute_stdio_message_loop(server)
 }
 
-/// Create an example server with sample resources, tools, and prompts
-fn create_example_server() -> server.Server {
+/// Create a production-ready server with comprehensive sample capabilities
+fn create_production_stdio_server() -> server.Server {
   server.new("MCP Toolkit Gleam", "1.0.0")
-  |> server.add_prompt(example_prompt(), example_prompt_handler)
-  |> server.add_resource(example_resource(), example_resource_handler)
+  |> server.add_prompt(create_code_review_prompt(), handle_code_review_prompt)
+  |> server.add_resource(
+    create_project_structure_resource(),
+    handle_project_structure_resource,
+  )
   |> server.add_tool(
-    example_tool(),
-    get_weather_decoder(),
-    example_tool_handler,
+    create_weather_tool(),
+    decode_weather_request(),
+    handle_weather_tool_request,
   )
   |> server.build
 }
 
-fn example_prompt() {
+fn create_code_review_prompt() {
   mcp.Prompt(
     name: "code_review",
     description: Some("Generate a comprehensive code review"),
@@ -51,7 +54,7 @@ fn example_prompt() {
   )
 }
 
-fn example_prompt_handler(_request) {
+fn handle_code_review_prompt(_request) {
   mcp.GetPromptResult(
     messages: [
       mcp.PromptMessage(
@@ -69,7 +72,7 @@ fn example_prompt_handler(_request) {
   |> Ok
 }
 
-fn example_resource() -> mcp.Resource {
+fn create_project_structure_resource() -> mcp.Resource {
   mcp.Resource(
     name: "project_structure",
     uri: "file:///project/structure.md",
@@ -80,7 +83,7 @@ fn example_resource() -> mcp.Resource {
   )
 }
 
-fn example_resource_handler(_request) {
+fn handle_project_structure_resource(_request) {
   mcp.ReadResourceResult(
     contents: [
       mcp.TextResource(mcp.TextResourceContents(
@@ -94,16 +97,16 @@ fn example_resource_handler(_request) {
   |> Ok
 }
 
-pub type GetWeather {
-  GetWeather(location: String)
+pub type WeatherToolRequest {
+  WeatherToolRequest(location: String)
 }
 
-fn get_weather_decoder() -> decode.Decoder(GetWeather) {
+fn decode_weather_request() -> decode.Decoder(WeatherToolRequest) {
   use location <- decode.field("location", decode.string)
-  decode.success(GetWeather(location:))
+  decode.success(WeatherToolRequest(location:))
 }
 
-fn example_tool() -> mcp.Tool {
+fn create_weather_tool() -> mcp.Tool {
   let assert Ok(schema) =
     "{
     \"type\": \"object\",
@@ -125,7 +128,7 @@ fn example_tool() -> mcp.Tool {
   )
 }
 
-fn example_tool_handler(_request) {
+fn handle_weather_tool_request(_request) {
   mcp.CallToolResult(
     content: [
       mcp.TextToolContent(mcp.TextContent(
