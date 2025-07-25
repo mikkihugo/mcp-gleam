@@ -20,12 +20,12 @@ gleam_erlang = ">= 0.34.0 and < 1.0.0"
 
 # Build targets
 [[binaries]]
-name = "mcpstdio"
-path = "./src/mcpstdio.gleam"
+name = "mcp_stdio_server"
+path = "./src/mcp_stdio_server.gleam"
 
 [[binaries]]
-name = "mcpserver"
-path = "./src/mcpserver.gleam"
+name = "mcp_full_server"
+path = "./src/mcp_full_server.gleam"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://raw.githubusercontent.com/github/copilot-instructions/main/schemas/copilot-instructions.json",
+  "version": "1.0",
+  "instructions": {
+    "global": {
+      "codeStyle": {
+        "language": "gleam",
+        "namingConvention": {
+          "functions": "snake_case",
+          "variables": "snake_case", 
+          "types": "PascalCase",
+          "modules": "snake_case"
+        },
+        "formatting": {
+          "indentation": "spaces",
+          "indentSize": 2,
+          "maxLineLength": 80
+        }
+      },
+      "projectSpecific": {
+        "framework": "MCP (Model Context Protocol)",
+        "architecture": "functional",
+        "targetRuntime": "OTP 28",
+        "dependencies": {
+          "core": ["gleam_stdlib", "gleam_json", "jsonrpc"],
+          "optional": ["gleam_http", "mist", "wisp"]
+        }
+      },
+      "priorities": [
+        "Code clarity and readability",
+        "Type safety and error handling", 
+        "Performance and memory efficiency",
+        "OTP 28 compatibility",
+        "Comprehensive testing"
+      ]
+    },
+    "contextual": {
+      "src/mcp_toolkit_gleam/core/": {
+        "description": "Core MCP protocol implementation",
+        "focus": ["Protocol compliance", "Type safety", "Error handling"]
+      },
+      "src/mcp_toolkit_gleam/transport/": {
+        "description": "Transport layer implementations",
+        "focus": ["Network reliability", "Performance", "Resource management"]
+      },
+      "test/": {
+        "description": "Test suite",
+        "focus": ["Test coverage", "Edge cases", "Clear assertions"]
+      }
+    }
+  }
+}

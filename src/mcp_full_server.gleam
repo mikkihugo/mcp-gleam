@@ -16,7 +16,7 @@ import mcp_toolkit_gleam/transport/stdio
 
 pub fn main() {
   case argv.load().arguments {
-    ["stdio"] -> run_stdio_only()
+    ["stdio"] -> execute_stdio_transport_only()
     // ["websocket"] -> run_websocket_server()
     // ["sse"] -> run_sse_server()
     // ["bridge"] -> run_bridge_example()
@@ -48,13 +48,13 @@ fn print_usage() {
   io.println("To enable them, uncomment mist dependency in gleam.toml")
 }
 
-fn run_stdio_only() {
+fn execute_stdio_transport_only() {
   io.println("Starting MCP Toolkit with stdio transport...")
-  let server = create_production_server()
-  run_stdio_loop(server)
+  let server = create_comprehensive_production_server()
+  execute_stdio_message_loop(server)
 }
 
-fn run_stdio_loop(server: server.Server) -> Nil {
+fn execute_stdio_message_loop(server: server.Server) -> Nil {
   case stdio.read_message() {
     Ok(msg) -> {
       case server.handle_message(server, msg) {
@@ -64,44 +64,62 @@ fn run_stdio_loop(server: server.Server) -> Nil {
     }
     Error(_) -> Nil
   }
-  run_stdio_loop(server)
+  execute_stdio_message_loop(server)
 }
 
-/// Create a production-ready server with comprehensive capabilities
-fn create_production_server() -> server.Server {
+/// Create a comprehensive production-ready server with all capabilities
+fn create_comprehensive_production_server() -> server.Server {
   server.new("MCP Toolkit Gleam", "1.0.0")
-  |> add_all_prompts()
-  |> add_all_resources()
-  |> add_all_tools()
+  |> configure_all_prompts()
+  |> configure_all_resources()
+  |> configure_all_tools()
   |> server.build
 }
 
-fn add_all_prompts(srv: server.Builder) -> server.Builder {
+fn configure_all_prompts(srv: server.Builder) -> server.Builder {
   srv
-  |> server.add_prompt(code_review_prompt(), code_review_handler)
-  |> server.add_prompt(documentation_prompt(), documentation_handler)
-  |> server.add_prompt(testing_prompt(), testing_handler)
+  |> server.add_prompt(create_code_review_prompt(), handle_code_review_request)
+  |> server.add_prompt(
+    create_documentation_prompt(),
+    handle_documentation_request,
+  )
+  |> server.add_prompt(create_testing_prompt(), handle_testing_request)
 }
 
-fn add_all_resources(srv: server.Builder) -> server.Builder {
+fn configure_all_resources(srv: server.Builder) -> server.Builder {
   srv
   |> server.add_resource(
-    project_structure_resource(),
-    project_structure_handler,
+    create_project_structure_resource(),
+    handle_project_structure_request,
   )
-  |> server.add_resource(api_docs_resource(), api_docs_handler)
-  |> server.add_resource(changelog_resource(), changelog_handler)
+  |> server.add_resource(
+    create_api_documentation_resource(),
+    handle_api_documentation_request,
+  )
+  |> server.add_resource(create_changelog_resource(), handle_changelog_request)
 }
 
-fn add_all_tools(srv: server.Builder) -> server.Builder {
+fn configure_all_tools(srv: server.Builder) -> server.Builder {
   srv
-  |> server.add_tool(weather_tool(), weather_decoder(), weather_handler)
-  |> server.add_tool(time_tool(), time_decoder(), time_handler)
-  |> server.add_tool(calculate_tool(), calculate_decoder(), calculate_handler)
+  |> server.add_tool(
+    create_weather_tool(),
+    decode_weather_request(),
+    handle_weather_request,
+  )
+  |> server.add_tool(
+    create_time_tool(),
+    decode_time_request(),
+    handle_time_request,
+  )
+  |> server.add_tool(
+    create_calculate_tool(),
+    decode_calculate_request(),
+    handle_calculate_request,
+  )
 }
 
 // Prompt definitions
-fn code_review_prompt() {
+fn create_code_review_prompt() {
   mcp.Prompt(
     name: "code_review",
     description: Some("Generate comprehensive code reviews with best practices"),
@@ -122,7 +140,7 @@ fn code_review_prompt() {
   )
 }
 
-fn code_review_handler(_request) {
+fn handle_code_review_request(_request) {
   mcp.GetPromptResult(
     messages: [
       mcp.PromptMessage(
@@ -140,7 +158,7 @@ fn code_review_handler(_request) {
   |> Ok
 }
 
-fn documentation_prompt() {
+fn create_documentation_prompt() {
   mcp.Prompt(
     name: "documentation",
     description: Some("Generate technical documentation"),
@@ -156,7 +174,7 @@ fn documentation_prompt() {
   )
 }
 
-fn documentation_handler(_request) {
+fn handle_documentation_request(_request) {
   mcp.GetPromptResult(
     messages: [
       mcp.PromptMessage(
@@ -174,7 +192,7 @@ fn documentation_handler(_request) {
   |> Ok
 }
 
-fn testing_prompt() {
+fn create_testing_prompt() {
   mcp.Prompt(
     name: "testing",
     description: Some("Generate test cases and testing strategies"),
@@ -182,7 +200,7 @@ fn testing_prompt() {
   )
 }
 
-fn testing_handler(_request) {
+fn handle_testing_request(_request) {
   mcp.GetPromptResult(
     messages: [
       mcp.PromptMessage(
@@ -201,7 +219,7 @@ fn testing_handler(_request) {
 }
 
 // Resource definitions
-fn project_structure_resource() -> mcp.Resource {
+fn create_project_structure_resource() -> mcp.Resource {
   mcp.Resource(
     name: "project_structure",
     uri: "file:///project/structure.md",
@@ -212,7 +230,7 @@ fn project_structure_resource() -> mcp.Resource {
   )
 }
 
-fn project_structure_handler(_request) {
+fn handle_project_structure_request(_request) {
   mcp.ReadResourceResult(
     contents: [
       mcp.TextResource(mcp.TextResourceContents(
@@ -226,7 +244,7 @@ fn project_structure_handler(_request) {
   |> Ok
 }
 
-fn api_docs_resource() -> mcp.Resource {
+fn create_api_documentation_resource() -> mcp.Resource {
   mcp.Resource(
     name: "api_docs",
     uri: "file:///project/api.md",
@@ -237,7 +255,7 @@ fn api_docs_resource() -> mcp.Resource {
   )
 }
 
-fn api_docs_handler(_request) {
+fn handle_api_documentation_request(_request) {
   mcp.ReadResourceResult(
     contents: [
       mcp.TextResource(mcp.TextResourceContents(
@@ -251,7 +269,7 @@ fn api_docs_handler(_request) {
   |> Ok
 }
 
-fn changelog_resource() -> mcp.Resource {
+fn create_changelog_resource() -> mcp.Resource {
   mcp.Resource(
     name: "changelog",
     uri: "file:///project/CHANGELOG.md",
@@ -262,7 +280,7 @@ fn changelog_resource() -> mcp.Resource {
   )
 }
 
-fn changelog_handler(_request) {
+fn handle_changelog_request(_request) {
   mcp.ReadResourceResult(
     contents: [
       mcp.TextResource(mcp.TextResourceContents(
@@ -281,12 +299,12 @@ pub type WeatherRequest {
   WeatherRequest(location: String)
 }
 
-fn weather_decoder() -> decode.Decoder(WeatherRequest) {
+fn decode_weather_request() -> decode.Decoder(WeatherRequest) {
   use location <- decode.field("location", decode.string)
   decode.success(WeatherRequest(location:))
 }
 
-fn weather_tool() -> mcp.Tool {
+fn create_weather_tool() -> mcp.Tool {
   let assert Ok(schema) =
     "{
     \"type\": \"object\",
@@ -308,7 +326,7 @@ fn weather_tool() -> mcp.Tool {
   )
 }
 
-fn weather_handler(_request) {
+fn handle_weather_request(_request) {
   mcp.CallToolResult(
     content: [
       mcp.TextToolContent(mcp.TextContent(
@@ -327,12 +345,12 @@ pub type TimeRequest {
   TimeRequest(timezone: option.Option(String))
 }
 
-fn time_decoder() -> decode.Decoder(TimeRequest) {
+fn decode_time_request() -> decode.Decoder(TimeRequest) {
   use timezone <- mcp.omittable_field("timezone", decode.string)
   decode.success(TimeRequest(timezone:))
 }
 
-fn time_tool() -> mcp.Tool {
+fn create_time_tool() -> mcp.Tool {
   let assert Ok(schema) =
     "{
     \"type\": \"object\",
@@ -353,7 +371,7 @@ fn time_tool() -> mcp.Tool {
   )
 }
 
-fn time_handler(_request) {
+fn handle_time_request(_request) {
   mcp.CallToolResult(
     content: [
       mcp.TextToolContent(mcp.TextContent(
@@ -372,12 +390,12 @@ pub type CalculateRequest {
   CalculateRequest(expression: String)
 }
 
-fn calculate_decoder() -> decode.Decoder(CalculateRequest) {
+fn decode_calculate_request() -> decode.Decoder(CalculateRequest) {
   use expression <- decode.field("expression", decode.string)
   decode.success(CalculateRequest(expression:))
 }
 
-fn calculate_tool() -> mcp.Tool {
+fn create_calculate_tool() -> mcp.Tool {
   let assert Ok(schema) =
     "{
     \"type\": \"object\",
@@ -399,7 +417,7 @@ fn calculate_tool() -> mcp.Tool {
   )
 }
 
-fn calculate_handler(_request) {
+fn handle_calculate_request(_request) {
   mcp.CallToolResult(
     content: [
       mcp.TextToolContent(mcp.TextContent(
